@@ -40,7 +40,6 @@ export default function DashboardLayout() {
       { name: "Manage Users", path: "/admin/users", icon: <Users size={20}/> },
       { name: "Manage Cars", path: "/admin/cars", icon: <Car size={20}/> },
       { name: "Manage Bookings", path: "/admin/bookings", icon: <BookOpen size={20}/> },
-      { name: "Reports", path: "/manager/reports", icon: <BarChart3 size={20}/> },
     ],
     manager: [
       { name: "Dashboard", path: "/manager/dashboard", icon: <LayoutDashboard size={20}/> },
