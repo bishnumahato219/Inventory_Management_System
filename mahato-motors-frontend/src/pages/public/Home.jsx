@@ -1,16 +1,14 @@
 import { useEffect, useState } from "react";
 import { useNavigate } from "react-router-dom";
 import Navbar from "../../components/navbar/Navbar";
-import { Search, Fuel, ArrowRight, Zap, ShieldCheck } from "lucide-react";
+import { Search, ArrowRight, Zap, ShieldCheck } from "lucide-react";
 
-// Using high-quality Maruti/Premium car images to match your showroom style
+// REMOVED the CSS string from the array to prevent the crash
 const slides = [
   "https://instagram.fdbd5-1.fna.fbcdn.net/v/t51.82787-15/621753561_18192071008352376_2038896646433977071_n.jpg?stp=dst-jpg_e35_tt6&_nc_cat=103&ig_cache_key=MjQ2MzAyNjQxNDQ5ODkzODk2OA%3D%3D.3-ccb7-5&ccb=7-5&_nc_sid=58cdad&efg=eyJ2ZW5jb2RlX3RhZyI6InhwaWRzLjc1MHg3Mzkuc2RyLkMzIn0%3D&_nc_ohc=fc2iBi9Aj-kQ7kNvwGnSxen&_nc_oc=Adm5zyW-yY-vJcgnHV0t-xDJtSTGBkHjHaUDgB5xJdJsL7wtRsb7vr12oAxcn4brMOVBwquqRXMDTkRgvojW8b4P&_nc_ad=z-m&_nc_cid=2034&_nc_zt=23&_nc_ht=instagram.fdbd5-1.fna&_nc_gid=rxvxZfzJW7__BUpOGmCkiw&oh=00_AfuY_DxsftbUXmn5Tksn-chlK-CSwvGSAGQytA-6mqnDgQ&oe=69A3D94F",
   "https://i.pinimg.com/736x/b1/7e/6f/b17e6f4f9eb49d3c2bd46dac19dbe626.jpg",
   "https://i.pinimg.com/736x/cc/e6/19/cce61947ae34b19ca75def3d0c15c456.jpg",
   "https://img.indianautosblog.com/resize/750x-/2018/04/2018-Maruti-Ertiga-Suzuki-Ertiga-front-angle.jpg",
-
-  "cursor: pointer; transform: translate3d(0px, 0px, 0px) scale(1); transform-origin: 0px 0px;",
 ];
 
 export default function Home() {
@@ -23,23 +21,27 @@ export default function Home() {
 
   const IMAGE_BASE_URL = "http://localhost:5000/";
 
-  // Auto-sliding logic
+  // Auto-sliding logic with safety check for slides length
   useEffect(() => {
+    if (slides.length === 0) return;
     const interval = setInterval(() => {
       setCurrent((prev) => (prev === slides.length - 1 ? 0 : prev + 1));
     }, 5000);
     return () => clearInterval(interval);
   }, []);
 
-  // Fetching inventory from backend
+  // Fetching inventory with array safety check
   useEffect(() => {
     const fetchCars = async () => {
       try {
         const res = await fetch("http://localhost:5000/api/cars");
+
         const data = await res.json();
-        setCars(data);
+        // Ensure data is an array before setting state
+        setCars(Array.isArray(data) ? data : []);
       } catch (err) {
         console.error("Inventory sync failed.");
+        setCars([]); // Fallback to empty array
       } finally {
         setLoading(false);
       }
@@ -50,7 +52,6 @@ export default function Home() {
   const handleBookingRedirect = (carId) => {
     const token = localStorage.getItem("token");
     if (!token) {
-      // Redirect to login if user is not authenticated
       navigate("/login");
     } else {
       navigate(`/booking/${carId}`);
@@ -69,9 +70,9 @@ export default function Home() {
     <div className="min-h-screen bg-slate-50 selection:bg-orange-500 selection:text-white">
       <Navbar />
 
-      {/* HERO SECTION WITH IMAGE SLIDER */}
       <section className="relative h-[90vh] w-full overflow-hidden">
-        {slides.map((img, index) => (
+        {/* Safety check to ensure we only map if slides exist */}
+        {slides.length > 0 && slides.map((img, index) => (
           <div
             key={index}
             className={`absolute inset-0 transition-all duration-1000 ease-in-out transform ${
@@ -113,7 +114,7 @@ export default function Home() {
         </div>
       </section>
 
-      {/* SEARCH & FILTERS */}
+      {/* INVENTORY SECTION */}
       <section id="collection" className="py-24 px-6 md:px-20">
         <div className="max-w-6xl mx-auto mb-16 flex flex-col md:flex-row gap-6 items-end justify-between">
           <div className="flex-1 w-full">
@@ -145,7 +146,6 @@ export default function Home() {
           </div>
         </div>
 
-        {/* CAR GRID */}
         {loading ? (
           <div className="text-center py-20 text-slate-400 font-bold uppercase tracking-widest animate-pulse">Synchronizing Data...</div>
         ) : (
@@ -187,7 +187,7 @@ export default function Home() {
         )}
       </section>
 
-      {/* FOOTER DETAILS */}
+      {/* FOOTER */}
       <footer className="bg-slate-950 text-white pt-24 pb-12 px-10 md:px-24">
         <div className="grid md:grid-cols-3 gap-20 mb-20">
           <div className="col-span-1 md:col-span-2">
