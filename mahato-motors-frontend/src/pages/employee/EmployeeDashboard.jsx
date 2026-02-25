@@ -1,65 +1,100 @@
-import { useEffect, useState } from "react";
+import React, { useEffect, useState } from "react";
 import { useNavigate } from "react-router-dom";
-import DashboardLayout from "../../layouts/DashboardLayout";
+import API from "../../api/axios";
+import { LayoutDashboard, CheckCircle, Clock, TrendingUp } from "lucide-react";
 
 export default function EmployeeDashboard() {
   const navigate = useNavigate();
-  const token = localStorage.getItem("token");
-
   const [employee, setEmployee] = useState(null);
   const [bookings, setBookings] = useState([]);
   const [loading, setLoading] = useState(true);
 
   useEffect(() => {
-    if (!token) return navigate("/login");
     fetchData();
   }, []);
 
   const fetchData = async () => {
     try {
-      const headers = { Authorization: `Bearer ${token}` };
+      // Use the API instance to handle headers automatically
+      const meRes = await API.get("/auth/me");
+      if (meRes.data.role !== "employee") return navigate("/");
+      setEmployee(meRes.data);
 
-      const me = await fetch("http://localhost:5000/api/auth/me", { headers });
-      const meData = await me.json();
-      if (meData.role !== "employee") return navigate("/");
-      setEmployee(meData);
-
-      const bookingsRes = await fetch("http://localhost:5000/api/bookings", { headers });
-      setBookings(await bookingsRes.json());
-
-    } catch {
-      localStorage.clear();
-      navigate("/login");
+      const bookingsRes = await API.get("/bookings");
+      setBookings(bookingsRes.data);
+    } catch (err) {
+      console.error("Dashboard Sync Error:", err);
+      // Optional: Redirect on auth failure
     } finally {
       setLoading(false);
     }
   };
 
-  if (loading) return <div className="pt-24 text-center">Loading...</div>;
+  if (loading) return (
+    <div className="flex h-64 items-center justify-center font-black text-slate-400 uppercase tracking-widest text-xs animate-pulse">
+      Syncing Operational Intelligence...
+    </div>
+  );
 
   return (
-    <DashboardLayout role="employee">
-      <div className="min-h-screen bg-slate-50 pt-24 px-10">
-        <h1 className="text-2xl font-bold">Employee Dashboard</h1>
-        <p className="text-slate-500 mt-2">Welcome, {employee?.name}</p>
-
-        <div className="grid md:grid-cols-2 gap-6 mt-10">
-          <StatCard title="Assigned Bookings" value={bookings.length} />
-          <StatCard
-            title="Delivered"
-            value={bookings.filter(b => b.status === "delivered").length}
-          />
-        </div>
+    <div className="space-y-10 animate-in fade-in duration-500">
+      {/* HEADER SECTION */}
+      <div>
+        <h1 className="text-4xl font-black text-slate-900 uppercase tracking-tighter">
+          Operations <span className="text-orange-600">Dashboard</span>
+        </h1>
+        <p className="text-slate-500 font-medium mt-1">
+          Welcome back, {employee?.name}. Performance metrics and logistics tracking.
+        </p>
       </div>
-    </DashboardLayout>
+
+      {/* STATISTICS GRID */}
+      <div className="grid md:grid-cols-3 gap-8">
+        <StatCard 
+          title="Active Assignments" 
+          value={bookings.filter(b => b.status !== "delivered").length} 
+          icon={<Clock className="text-orange-500" />}
+          desc="Bookings pending fulfillment."
+        />
+        <StatCard 
+          title="Successful Deliveries" 
+          value={bookings.filter(b => b.status === "delivered").length} 
+          icon={<CheckCircle className="text-green-500" />}
+          desc="Vehicles successfully dispatched."
+        />
+        <StatCard 
+          title="Total Managed" 
+          value={bookings.length} 
+          icon={<TrendingUp className="text-blue-500" />}
+          desc="Lifetime assignment volume."
+        />
+      </div>
+
+      {/* QUICK VIEW TABLE */}
+      <div className="bg-white rounded-[2.5rem] border border-slate-100 shadow-xl shadow-slate-200/50 overflow-hidden p-2">
+         <div className="p-8">
+            <h3 className="text-sm font-black text-slate-900 uppercase tracking-widest">Recent Assignments</h3>
+         </div>
+         {/* Placeholder for a simplified assignments table */}
+         <div className="px-8 pb-8 text-center text-slate-400 font-bold uppercase text-[10px] tracking-widest">
+            Detailed ledger available in "Sales Entry" section.
+         </div>
+      </div>
+    </div>
   );
 }
 
-function StatCard({ title, value }) {
+function StatCard({ title, value, icon, desc }) {
   return (
-    <div className="bg-white p-6 rounded-xl shadow">
-      <h2 className="text-slate-600">{title}</h2>
-      <p className="text-2xl font-bold mt-2">{value}</p>
+    <div className="bg-white p-8 rounded-[2.5rem] border border-slate-100 shadow-xl shadow-slate-200/50 group hover:-translate-y-1 transition-all">
+      <div className="flex justify-between items-start mb-6">
+        <div className="bg-slate-50 p-4 rounded-2xl group-hover:bg-orange-50 transition-colors">
+          {icon}
+        </div>
+        <p className="text-4xl font-black text-slate-900">{value}</p>
+      </div>
+      <h2 className="text-[10px] font-black text-slate-400 uppercase tracking-widest mb-1">{title}</h2>
+      <p className="text-xs text-slate-500 font-medium">{desc}</p>
     </div>
   );
 }

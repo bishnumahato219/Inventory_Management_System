@@ -15,7 +15,7 @@ const {
 
 // GET ALL CARS (Public / Logged-in)
 
-router.get("/", getCars);
+router.get("/", protect, allowRoles("manager", "admin", "employee"), getCars);
 
 
 
@@ -47,5 +47,7 @@ router.delete(
   allowRoles("manager", "admin"),
   deleteCar
 );
+
+
 
 module.exports = router;

@@ -1,77 +1,52 @@
 const Car = require("../models/car.js");
 const StockLog = require("../models/stockLog.js");
 
-// STOCK IN
-exports.stockIn = async (req, res) => {
+// Unified Logic
+const processStock = async (req, res, direction) => {
   try {
     const { carId, quantity, reason } = req.body;
-
     const car = await Car.findById(carId);
-    if (!car) {
-      return res.status(404).json({ message: "Car not found" });
+    
+    if (!car) return res.status(404).json({ message: "Asset Not Found" });
+
+    const qty = Number(quantity);
+    
+    if (direction === "OUT") {
+      if (car.stock < qty) return res.status(400).json({ message: "Insufficient Inventory" });
+      car.stock -= qty;
+    } else {
+      car.stock += qty;
     }
 
-    car.stock += quantity;
-    car.status = "available";
+    car.status = car.stock > 0 ? "available" : "out_of_stock";
     await car.save();
 
+    // MATCHING THE SCHEMA: Use itemType and itemId
     await StockLog.create({
-      itemType: "car",
-      itemId: carId,
-      action: "IN",
-      quantity,
-      reason,
-      performedBy: req.user.id
+      itemType: "car", 
+      itemId: carId, 
+      action: direction,
+      quantity: qty,
+      reason: reason || "Manual Adjustment",
+      performedBy: req.user.id 
     });
 
-    res.json({ message: "Stock added successfully", car });
+    res.json({ success: true, message: `Stock ${direction} Successful` });
   } catch (error) {
-    res.status(500).json({ error: error.message });
+    res.status(500).json({ message: "Protocol Error: Transaction Failed", error: error.message });
   }
 };
 
-// STOCK OUT
-exports.stockOut = async (req, res) => {
-  try {
-    const { carId, quantity, reason } = req.body;
+// Explicit exports to ensure the router finds the functions
+exports.stockIn = async (req, res) => await processStock(req, res, "IN");
+exports.stockOut = async (req, res) => await processStock(req, res, "OUT");
 
-    const car = await Car.findById(carId);
-    if (!car) {
-      return res.status(404).json({ message: "Car not found" });
-    }
-
-    if (car.stock < quantity) {
-      return res.status(400).json({ message: "Insufficient stock" });
-    }
-
-    car.stock -= quantity;
-    if (car.stock === 0) {
-      car.status = "out_of_stock";
-    }
-    await car.save();
-
-    await StockLog.create({
-      itemType: "car",
-      itemId: carId,
-      action: "OUT",
-      quantity,
-      reason,
-      performedBy: req.user.id
-    });
-
-    res.json({ message: "Stock reduced successfully", car });
-  } catch (error) {
-    res.status(500).json({ error: error.message });
-  }
-};
-
-// STOCK HISTORY
 exports.stockHistory = async (req, res) => {
   try {
     const logs = await StockLog.find()
-      .populate("performedBy", "name role")
+      .populate("performedBy", "name role") //
+      .populate("itemId", "modelName")    // FIXED: Must match schema field 'itemId'
       .sort({ createdAt: -1 });
-
     res.json(logs);
   } catch (error) {
     res.status(500).json({ error: error.message });
