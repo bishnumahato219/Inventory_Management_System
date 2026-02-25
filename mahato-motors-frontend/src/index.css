@@ -1,0 +1,56 @@
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+@layer components {
+
+  .btn-primary {
+    @apply bg-gradient-to-r from-[#8100d1] to-[#b500b2] text-white px-4 py-2 rounded-xl transition hover:opacity-90;
+  }
+
+  .card-base {
+    @apply bg-[#ffa47f] dark:bg-zinc-800 rounded-2xl shadow-lg p-6 transition hover:scale-105;
+  }
+
+}
+
+@keyframes zoom {
+  0% { transform: scale(1.05); }
+  50% { transform: scale(1.15); }
+  100% { transform: scale(1.05); }
+}
+
+.animate-zoom {
+  animation: zoom 15s linear infinite;
+}
+
+@keyframes fadeInUp {
+  from { opacity: 0; transform: translateY(20px); }
+  to { opacity: 1; transform: translateY(0); }
+}
+
+.animate-fadeInUp {
+  animation: fadeInUp 1s ease forwards;
+}
+
+@keyframes shimmer {
+  0% { transform: translateX(-100%) rotate(12deg); }
+  100% { transform: translateX(200%) rotate(12deg); }
+}
+
+.animate-shimmer {
+  animation: shimmer 6s infinite linear;
+}
+
+/* //mouse effect */
+
+.reveal {
+  opacity: 0;
+  transform: translateY(40px);
+  transition: all 0.8s ease;
+}
+
+.reveal.active {
+  opacity: 1;
+  transform: translateY(0);
+}
