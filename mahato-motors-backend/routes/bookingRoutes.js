@@ -9,6 +9,8 @@ const {
   getBookings,
   updateBookingStatus,
   cancelBooking,
+  getPendingBookings,
+  getInvoice
 } = require("../controllers/bookingController");
 
 // Customer
@@ -17,13 +19,22 @@ router.post("/", protect, allowRoles("customer"), createBooking);
 // All roles
 router.get("/", protect, getBookings);
 
+// Get pending bookings 
+router.get("/pending", protect, allowRoles("employee", "manager"), getPendingBookings);
+
+// Get Invoice (Delivered Booking Only)
+router.get(
+  "/:id/invoice",
+  protect,
+  getInvoice
+);
+
 // Customer, Employee, Manager cancel booking
 router.delete("/:id", protect, allowRoles("customer", "employee", "manager"), cancelBooking);
 
 // Employee / Manager
 router.put("/:id/status", protect, allowRoles("employee", "manager"), updateBookingStatus);
 
-// routes
-router.put("/status/:id", protect, updateBookingStatus);
+
 
 module.exports = router;

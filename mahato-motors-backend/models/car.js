@@ -39,6 +39,18 @@ const carSchema = new mongoose.Schema(
     image: {
       type: String,
     },
+    sku: {
+  type: String,
+  unique: true,
+  required: true,
+  trim: true
+},
+barcode: {
+  type: String,
+  unique: true,
+  required: true,
+  trim: true
+}
   },
   { timestamps: true }
 );

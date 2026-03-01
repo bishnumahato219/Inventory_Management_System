@@ -21,9 +21,11 @@
     "html2canvas": "^1.4.1",
     "jsonwebtoken": "^9.0.3",
     "jspdf": "^4.2.0",
+    "mongodb": "^7.1.0",
     "mongoose": "^9.1.5",
     "morgan": "^1.10.1",
-    "multer": "^2.0.2"
+    "multer": "^2.0.2",
+    "react-barcode": "^1.6.1"
   },
   "devDependencies": {
     "nodemon": "^3.1.13"

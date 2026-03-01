@@ -35,11 +35,10 @@ import Settings from "../pages/manager/Settings";
 import PurchaseStock from "../pages/manager/PurchaseStock";
 import StockManagement from "../pages/manager/StockManagement";
 
-// Employee Management
-import Sales from "../pages/employee/Sales";
 // customer
 import MyBookings from "../pages/customer/MyBookings";
 import CustomerSettings from "../pages/customer/CustomerSettings";
+import Invoice from "../pages/public/Invoice";
 
 export default function AppRoutes() {
   return (
@@ -66,6 +65,7 @@ export default function AppRoutes() {
             <MyBookings />
           </ProtectedRoute>
         } />
+        <Route path="/invoice/:id" element={<Invoice />} />
         <Route path="/customer/settings" element={
           <ProtectedRoute allowedRoles={["customer"]}>
             <CustomerSettings />
@@ -107,7 +107,6 @@ export default function AppRoutes() {
             <EmployeeDashboard />
           </ProtectedRoute>
         } />
-        <Route path="/employee/sales" element={<Sales />} />
       </Route>
 
       {/* 404 Always Last */}

@@ -7,7 +7,9 @@ const { allowRoles } = require("../Helper/roleMiddleware");
 const {
   createManager,
   createEmployee,
-  getAllUsers
+  getAllUsers,
+  registerUser,
+  deleteUser
 } = require("../controllers/userController");
 
 // ADMIN → MANAGER
@@ -32,6 +34,17 @@ router.get(
   protect, 
   allowRoles("admin", "manager"), 
   getAllUsers
+);
+
+// PUBLIC REGISTER (Customer)
+router.post("/register", registerUser);
+
+// DELETE USER (Admin + Manager)
+router.delete(
+  "/:id",
+  protect,
+  allowRoles("admin", "manager"),
+  deleteUser
 );
 
 module.exports = router;

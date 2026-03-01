@@ -10,7 +10,8 @@ const {
   getCars,
   getCarById,
   updateCar,
-  deleteCar
+  deleteCar,
+  scanCar
 } = require("../controllers/carController");
 
 // GET ALL CARS (Public / Logged-in)
@@ -47,6 +48,9 @@ router.delete(
   allowRoles("manager", "admin"),
   deleteCar
 );
+
+//scan car by barcode (employee only)
+router.post("/scan", scanCar);
 
 
 

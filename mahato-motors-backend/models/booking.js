@@ -24,7 +24,14 @@ const bookingSchema = new mongoose.Schema(
     bookingDate: {
       type: Date,
       default: Date.now
-    }
+    },
+    invoiceNumber: {
+  type: String
+},
+deliveryDate: {
+  type: Date
+}
+    
   },
   { timestamps: true }
 );

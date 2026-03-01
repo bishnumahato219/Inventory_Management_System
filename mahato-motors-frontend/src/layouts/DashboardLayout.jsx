@@ -55,7 +55,6 @@ export default function DashboardLayout() {
     ],
     employee: [
       { name: "Dashboard", path: "/employee/dashboard", icon: <LayoutDashboard size={20}/> },
-      { name: "Sales Entry", path: "/employee/sales", icon: <ScrollText size={20}/> },
       { name: "Manage Bookings", path: "/admin/bookings", icon: <BookOpen size={20}/> },
       { name: "Stock Management", path: "/manager/StockManagement", icon: <Warehouse size={20}/> },
     ],
