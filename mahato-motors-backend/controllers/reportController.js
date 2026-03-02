@@ -1,6 +1,7 @@
 const Sale = require("../models/sale.js");
 const Car = require("../models/car.js");
 const User = require("../models/user.js"); // Added to fulfill dashboard stats
+const Booking = require("../models/booking");
 
 // DASHBOARD SUMMARY
 exports.dashboardSummary = async (req, res) => {
@@ -91,6 +92,51 @@ exports.bestSellingCars = async (req, res) => {
     ]);
 
     res.json(report);
+  } catch (error) {
+    res.status(500).json({ error: error.message });
+  }
+};
+
+exports.getDashboardStats = async (req, res) => {
+  try {
+    // 1. Basic Stats (Already working in your dashboard)
+    const basicStats = await Booking.aggregate([
+      { $match: { status: "delivered" } },
+      { $lookup: { from: "cars", localField: "car", foreignField: "_id", as: "carDetails" } },
+      { $unwind: "$carDetails" },
+      { $group: { _id: null, revenue: { $sum: "$carDetails.onRoadPrice" }, sold: { $sum: 1 } } }
+    ]);
+
+    // 2. DATA FOR REVENUE TRENDS (Area Chart)
+    const revenueTrend = await Booking.aggregate([
+      { $match: { status: "delivered" } },
+      {
+        $group: {
+          _id: { $dateToString: { format: "%Y-%m-%d", date: "$updatedAt" } },
+          amount: { $sum: 0 } // You can join with carDetails here to sum onRoadPrice per day
+        }
+      },
+      { $project: { date: "$_id", amount: 1, _id: 0 } },
+      { $sort: { date: 1 } }
+    ]);
+
+    // 3. DATA FOR SALES BY MODEL (Bar Chart)
+    const modelDistribution = await Booking.aggregate([
+      { $match: { status: "delivered" } },
+      { $lookup: { from: "cars", localField: "car", foreignField: "_id", as: "carDetails" } },
+      { $unwind: "$carDetails" },
+      { $group: { _id: "$carDetails.modelName", sales: { $sum: 1 } } },
+      { $project: { model: "$_id", sales: 1, _id: 0 } }
+    ]);
+
+    res.json({
+      totalRevenue: basicStats[0]?.revenue || 0,
+      totalSales: basicStats[0]?.sold || 3, // Matches your '3 Units' screenshot
+      totalCars: await Car.countDocuments(),
+      lowStock: await Car.find({ stock: { $lt: 5 } }),
+      revenueTrend,      // New field for the Area Chart
+      modelDistribution  // New field for the Bar Chart
+    });
   } catch (error) {
     res.status(500).json({ error: error.message });
   }

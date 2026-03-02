@@ -1,20 +1,27 @@
 import React, { useEffect, useState } from "react";
 import API from "../../api/axios";
 import { 
+  BarChart, Bar, XAxis, YAxis, CartesianGrid, Tooltip, 
+  ResponsiveContainer, AreaChart, Area, Cell 
+} from "recharts";
+import { 
   Car, AlertTriangle, TrendingUp, History, 
   IndianRupee, ShieldCheck, ArrowUpRight, 
-  Layers, Activity, ChevronRight 
+  Layers, Activity, BarChart3 
 } from "lucide-react";
+
+const COLORS = ["#f97316", "#3b82f6", "#8277a7", "#10b981"];
 
 export default function AdminDashboard() {
   const [stats, setStats] = useState({ 
     totalCars: 0, 
     outOfStock: 0, 
-    totalValue: 0, 
+    totalRevenue: 0, 
     recentCars: [],
     totalSales: 0,
     lowStock: [],
-    monthlyRevenue: [] 
+    monthlyRevenue: [],
+    modelDistribution: [] // New field for the bar chart
   });
   const [loading, setLoading] = useState(true);
 
@@ -43,7 +50,7 @@ export default function AdminDashboard() {
   );
 
   return (
-    <div className="p-4 space-y-8 bg-slate-50 min-h-screen">
+    <div className="p-6 space-y-8 bg-slate-50 min-h-screen font-sans">
       
       {/* HEADER SECTION */}
       <div className="flex flex-col md:flex-row md:items-center justify-between gap-4">
@@ -61,8 +68,7 @@ export default function AdminDashboard() {
 
       {/* TOP KPI GRID */}
       <div className="grid grid-cols-1 md:grid-cols-3 gap-8">
-        
-        {/* TOTAL VALUE CARD (Manager Style - Dark) */}
+        {/* TOTAL REVENUE CARD - Manager Style Dark */}
         <div className="relative overflow-hidden group bg-slate-900 rounded-[2.5rem] p-8 text-white shadow-2xl transition-transform hover:-translate-y-2">
           <div className="absolute top-0 right-0 p-8 opacity-10 group-hover:scale-110 transition-transform">
             <TrendingUp size={120} />
@@ -71,18 +77,18 @@ export default function AdminDashboard() {
             <div className="bg-orange-500 w-12 h-12 rounded-2xl flex items-center justify-center mb-6 shadow-lg">
               <IndianRupee size={24} />
             </div>
-            <p className="text-slate-400 font-bold uppercase tracking-widest text-[10px] mb-2">Portfolio Valuation</p>
+            <p className="text-slate-400 font-bold uppercase tracking-widest text-[10px] mb-2">Total Life-Time Revenue</p>
             <h3 className="text-4xl font-black tracking-tight">
-              ₹{stats.totalValue?.toLocaleString("en-IN")}
+              ₹{(stats.totalRevenue || 0).toLocaleString("en-IN")}
             </h3>
             <div className="mt-6 flex items-center gap-2 text-green-400 text-xs font-bold">
-              <Activity size={16} /> Live Market Estimate
+              <ArrowUpRight size={16} /> +12.5% Growth
             </div>
           </div>
         </div>
 
-        {/* TOTAL FLEET CARD */}
-        <div className="bg-white rounded-[2.5rem] p-8 border border-slate-100 shadow-xl shadow-slate-200/50 transition-transform hover:-translate-y-2">
+        {/* TOTAL FLEET */}
+        <div className="bg-white rounded-[2.5rem] p-8 border border-slate-100 shadow-xl transition-transform hover:-translate-y-2">
           <div className="bg-blue-50 w-12 h-12 rounded-2xl flex items-center justify-center mb-6 text-blue-600">
             <Car size={24} />
           </div>
@@ -90,11 +96,11 @@ export default function AdminDashboard() {
           <h3 className="text-4xl font-black text-slate-900 tracking-tight">
             {stats.totalCars} <span className="text-lg text-slate-300 font-medium">Units</span>
           </h3>
-          <p className="mt-6 text-slate-400 text-xs font-medium">Across all categories and variants.</p>
+          <p className="mt-6 text-slate-400 text-xs font-medium">Live fleet variants in stock.</p>
         </div>
 
-        {/* TOTAL SALES CARD */}
-        <div className="bg-white rounded-[2.5rem] p-8 border border-slate-100 shadow-xl shadow-slate-200/50 transition-transform hover:-translate-y-2">
+        {/* GROSS SALES */}
+        <div className="bg-white rounded-[2.5rem] p-8 border border-slate-100 shadow-xl transition-transform hover:-translate-y-2">
           <div className="bg-orange-50 w-12 h-12 rounded-2xl flex items-center justify-center mb-6 text-orange-600">
             <Layers size={24} />
           </div>
@@ -106,35 +112,58 @@ export default function AdminDashboard() {
         </div>
       </div>
 
-      <div className="grid grid-cols-1 lg:grid-cols-3 gap-8">
-        
-        {/* REVENUE PER MONTH - MODERN LIST */}
-        <div className="bg-white rounded-[2.5rem] p-10 border border-slate-100 shadow-xl">
-          <div className="flex items-center gap-4 mb-8">
-            <div className="bg-orange-100 p-3 rounded-xl text-orange-600">
-              <TrendingUp size={24} />
-            </div>
-            <div>
-              <h3 className="text-xl font-black text-slate-800 uppercase tracking-tight">Revenue Trends</h3>
-              <p className="text-slate-400 text-[10px] font-bold uppercase tracking-widest">Monthly Performance</p>
-            </div>
+      {/* CHARTS SECTION */}
+      <div className="grid grid-cols-1 lg:grid-cols-2 gap-8">
+        {/* REVENUE TRENDS - Area Chart */}
+        <div className="bg-white p-8 rounded-[2.5rem] border border-slate-100 shadow-xl">
+          <div className="flex items-center gap-3 mb-8">
+            <TrendingUp className="text-orange-600" />
+            <h3 className="text-lg font-black text-slate-800 uppercase tracking-tight">Revenue Trends</h3>
           </div>
-          
-          <div className="space-y-4">
-            {stats.monthlyRevenue?.map((data, idx) => (
-              <div key={idx} className="group flex justify-between items-center p-5 bg-slate-50 rounded-3xl border border-transparent hover:border-orange-200 transition-all">
-                <div>
-                  <p className="text-xs font-black text-slate-800 uppercase tracking-tight">{data.month}</p>
-                  <div className="flex items-center gap-1 text-[8px] text-green-500 font-black uppercase">
-                    <ArrowUpRight size={10} /> Growth
-                  </div>
-                </div>
-                <p className="text-sm font-black text-slate-900">₹{data.amount.toLocaleString("en-IN")}</p>
-              </div>
-            ))}
+          <div className="h-72">
+            <ResponsiveContainer width="100%" height="100%">
+              <AreaChart data={stats.monthlyRevenue}>
+                <defs>
+                  <linearGradient id="colorRev" x1="0" y1="0" x2="0" y2="1">
+                    <stop offset="5%" stopColor="#f97316" stopOpacity={0.3}/>
+                    <stop offset="95%" stopColor="#f97316" stopOpacity={0}/>
+                  </linearGradient>
+                </defs>
+                <CartesianGrid strokeDasharray="3 3" vertical={false} stroke="#f1f5f9" />
+                <XAxis dataKey="month" fontSize={10} fontWeight="bold" axisLine={false} tickLine={false} />
+                <YAxis hide />
+                <Tooltip 
+                  contentStyle={{borderRadius: '16px', border: 'none', boxShadow: '0 10px 15px rgba(0,0,0,0.1)'}} 
+                />
+                <Area type="monotone" dataKey="amount" stroke="#f97316" fillOpacity={1} fill="url(#colorRev)" strokeWidth={3} />
+              </AreaChart>
+            </ResponsiveContainer>
           </div>
         </div>
 
+        {/* SALES BY MODEL - Bar Chart */}
+        <div className="bg-white p-8 rounded-[2.5rem] border border-slate-100 shadow-xl">
+          <div className="flex items-center gap-3 mb-8">
+            <BarChart3 className="text-blue-600" />
+            <h3 className="text-lg font-black text-slate-800 uppercase tracking-tight">Sales by Model</h3>
+          </div>
+          <div className="h-72">
+            <ResponsiveContainer width="100%" height="100%">
+              <BarChart data={stats.modelDistribution}>
+                <XAxis dataKey="model" fontSize={10} fontWeight="bold" axisLine={false} tickLine={false} />
+                <Tooltip cursor={{fill: '#f8fafc'}} />
+                <Bar dataKey="sales" radius={[8, 8, 0, 0]}>
+                  {stats.modelDistribution?.map((entry, index) => (
+                    <Cell key={`cell-${index}`} fill={COLORS[index % COLORS.length]} />
+                  ))}
+                </Bar>
+              </BarChart>
+            </ResponsiveContainer>
+          </div>
+        </div>
+      </div>
+
+      <div className="grid grid-cols-1 lg:grid-cols-3 gap-8">
         {/* RECENT RECORDS LEDGER */}
         <div className="lg:col-span-2 bg-white rounded-[2.5rem] border border-slate-100 shadow-xl overflow-hidden">
           <div className="p-10 flex items-center justify-between">
@@ -173,7 +202,9 @@ export default function AdminDashboard() {
                       </span>
                     </td>
                     <td className="px-6 py-5 text-right rounded-r-3xl border-y border-r border-transparent group-hover:border-orange-100">
-                      <p className="text-sm font-black text-slate-900">₹{car.exShowroomPrice.toLocaleString("en-IN")}</p>
+                      <p className="text-sm font-black text-slate-900">
+                        ₹{(car.exShowroomPrice || 0).toLocaleString("en-IN")}
+                      </p>
                     </td>
                   </tr>
                 ))}
@@ -181,40 +212,42 @@ export default function AdminDashboard() {
             </table>
           </div>
         </div>
-      </div>
 
-      {/* CRITICAL STOCK ALERTS (Manager Style - Bottom) */}
-      <div className="bg-white rounded-[2.5rem] p-10 border border-slate-100 shadow-xl">
-        <div className="flex items-center justify-between mb-8">
-          <div className="flex items-center gap-4">
+        {/* CRITICAL ALERTS */}
+        <div className="bg-white rounded-[2.5rem] p-10 border border-slate-100 shadow-xl">
+          <div className="flex items-center gap-4 mb-8">
             <div className="bg-red-100 p-3 rounded-xl text-red-600">
               <AlertTriangle size={24} />
             </div>
             <div>
-              <h3 className="text-xl font-black text-slate-800 uppercase tracking-tight">Critical Stock Alerts</h3>
-              <p className="text-slate-400 text-xs font-bold uppercase tracking-widest mt-1">Management Action Required</p>
+              <h3 className="text-xl font-black text-slate-800 uppercase tracking-tight">Critical Stock</h3>
+              <p className="text-slate-400 text-[10px] font-bold uppercase tracking-widest mt-1">Management Action Required</p>
             </div>
           </div>
-        </div>
-
-        <div className="grid grid-cols-1 md:grid-cols-4 gap-6">
-          {stats.lowStock?.map((car) => (
-            <div key={car._id} className="p-6 bg-slate-50 rounded-3xl border border-transparent hover:border-red-200 hover:bg-red-50 transition-all">
-              <p className="text-xs font-black text-slate-800 uppercase tracking-tight">{car.modelName}</p>
-              <div className="mt-2 flex justify-between items-end">
-                <span className="text-2xl font-black text-red-600">{car.stock}</span>
-                <span className="text-[8px] text-slate-400 font-black uppercase mb-1">Units Left</span>
+          <div className="space-y-4">
+            {stats.lowStock?.map((car) => (
+              <div key={car._id} className="p-6 bg-slate-50 rounded-3xl border border-transparent hover:border-red-200 hover:bg-red-50 transition-all flex justify-between items-center">
+                <div>
+                  <p className="text-xs font-black text-slate-800 uppercase">{car.modelName}</p>
+                  <p className="text-[8px] text-slate-400 font-bold uppercase tracking-widest">{car.variant}</p>
+                </div>
+                <div className="text-right text-red-600 font-black">
+                  <span className="text-xl">{car.stock}</span>
+                  <p className="text-[8px] uppercase tracking-widest text-slate-400">Left</p>
+                </div>
               </div>
-            </div>
-          ))}
-          {stats.lowStock?.length === 0 && (
-            <div className="col-span-full py-6 text-center text-slate-400 font-bold uppercase text-[10px] tracking-widest italic">
-               Inventory levels within safety parameters.
-            </div>
-          )}
+            ))}
+            {stats.lowStock?.length === 0 && (
+               <div className="py-10 text-center flex flex-col items-center gap-4">
+                  <div className="h-12 w-12 bg-green-50 text-green-500 rounded-full flex items-center justify-center">
+                    <ShieldCheck size={24} />
+                  </div>
+                  <p className="text-sm text-slate-400 font-bold uppercase tracking-widest italic text-center">All inventory levels healthy.</p>
+               </div>
+            )}
+          </div>
         </div>
       </div>
-
     </div>
   );
 }

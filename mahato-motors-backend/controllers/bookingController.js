@@ -200,3 +200,46 @@ exports.getInvoice = async (req, res) => {
     res.status(500).json({ message: error.message });
   }
 };
+
+/* =========================================
+   GET DASHBOARD ANALYTICS (Revenue & Sales)
+========================================= */
+exports.getAnalytics = async (req, res) => {
+  try {
+    // 1. Basic Stats (Revenue & Units)
+    const summary = await Booking.aggregate([
+      { $match: { status: "delivered" } },
+      { $lookup: { from: "cars", localField: "car", foreignField: "_id", as: "carDetails" } },
+      { $unwind: "$carDetails" },
+      { $group: { _id: null, revenue: { $sum: "$carDetails.onRoadPrice" }, sold: { $sum: 1 } } }
+    ]);
+
+    // 2. Bar Chart Data: Revenue by Model Name
+    const revenueByModel = await Booking.aggregate([
+      { $match: { status: "delivered" } },
+      { $lookup: { from: "cars", localField: "car", foreignField: "_id", as: "carDetails" } },
+      { $unwind: "$carDetails" },
+      { $group: { _id: "$carDetails.modelName", revenue: { $sum: "$carDetails.onRoadPrice" } } },
+      { $project: { name: "$_id", value: "$revenue", _id: 0 } }
+    ]);
+
+    // 3. Pie Chart Data: Sales by Fuel Type
+    const salesByFuel = await Booking.aggregate([
+      { $match: { status: "delivered" } },
+      { $lookup: { from: "cars", localField: "car", foreignField: "_id", as: "carDetails" } },
+      { $unwind: "$carDetails" },
+      { $group: { _id: "$carDetails.fuelType", count: { $sum: 1 } } },
+      { $project: { name: "$_id", value: "$count", _id: 0 } }
+    ]);
+
+    res.json({
+      revenue: summary[0]?.revenue || 0,
+      soldCount: summary[0]?.sold || 0,
+      activeModels: await Car.countDocuments({ stock: { $gt: 0 } }),
+      revenueByModel,
+      salesByFuel
+    });
+  } catch (error) {
+    res.status(500).json({ error: error.message });
+  }
+};

@@ -10,8 +10,11 @@ const {
   updateBookingStatus,
   cancelBooking,
   getPendingBookings,
-  getInvoice
+  getInvoice,
+  getAnalytics
 } = require("../controllers/bookingController");
+
+router.get("/analytics", protect, allowRoles("admin"),getAnalytics);
 
 // Customer
 router.post("/", protect, allowRoles("customer"), createBooking);

@@ -8,11 +8,13 @@ const { allowRoles } = require("../Helper/roleMiddleware");
 const { 
   dashboardSummary, 
   monthlySalesReport, 
-  bestSellingCars 
+  bestSellingCars ,
+  getDashboardStats
 } = require("../controllers/reportController"); // Check karein filename 'reportController' hai ya 'report'
 
 // Admin endpoints
 router.get("/admin", protect, allowRoles("admin"), dashboardSummary);
+router.get("/dashboard", protect, allowRoles("manager", "admin"), getDashboardStats);
 
 // Manager endpoints
 router.get("/dashboard", protect, allowRoles("manager"), dashboardSummary);
