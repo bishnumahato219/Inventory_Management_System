@@ -1,0 +1,86 @@
+<svg viewBox="0 0 240 240" xmlns="http://www.w3.org/2000/svg">
+  <defs>
+    <!-- Modern Blue Cyan Gradients -->
+    <linearGradient id="blueGradient" x1="0%" y1="0%" x2="100%" y2="100%">
+      <stop offset="0%" style="stop-color:#1E3A5F;stop-opacity:1" />
+      <stop offset="50%" style="stop-color:#0F5A8C;stop-opacity:1" />
+      <stop offset="100%" style="stop-color:#003D7A;stop-opacity:1" />
+    </linearGradient>
+    
+    <linearGradient id="cyanGradient" x1="0%" y1="0%" x2="100%" y2="100%">
+      <stop offset="0%" style="stop-color:#00D4FF;stop-opacity:1" />
+      <stop offset="100%" style="stop-color:#0088FF;stop-opacity:1" />
+    </linearGradient>
+    
+    <radialGradient id="centerGlow" cx="50%" cy="40%" r="60%">
+      <stop offset="0%" style="stop-color:#FFFFFF;stop-opacity:0.35" />
+      <stop offset="100%" style="stop-color:#00D4FF;stop-opacity:0" />
+    </radialGradient>
+    
+    <linearGradient id="bgGradient" x1="0%" y1="0%" x2="100%" y2="100%">
+      <stop offset="0%" style="stop-color:#FFFFFF;stop-opacity:1" />
+      <stop offset="100%" style="stop-color:#F0F5FA;stop-opacity:1" />
+    </linearGradient>
+    
+    <!-- Filters -->
+    <filter id="softShadow">
+      <feDropShadow dx="0" dy="6" stdDeviation="8" flood-opacity="0.2"/>
+    </filter>
+    
+    <filter id="glowEffect">
+      <feGaussianBlur in="SourceGraphic" stdDeviation="2"/>
+    </filter>
+  </defs>
+  
+  <!-- Outer Circle Background -->
+  <circle cx="120" cy="120" r="115" fill="url(#bgGradient)" stroke="#D4E5F5" stroke-width="2"/>
+  
+  <!-- Inner white circle base -->
+  <circle cx="120" cy="120" r="110" fill="#FFFFFF"/>
+  
+  <!-- Decorative ring - Blue gradient -->
+  <circle cx="120" cy="120" r="105" fill="none" stroke="url(#blueGradient)" stroke-width="2" opacity="0.15"/>
+  
+  <!-- Center glow -->
+  <circle cx="120" cy="120" r="100" fill="url(#centerGlow)"/>
+  
+  <!-- Large Modern MM Monogram -->
+  <g filter="url(#softShadow)">
+    <!-- Outer blue circle background for MM -->
+    <circle cx="120" cy="120" r="75" fill="url(#blueGradient)" opacity="0.95"/>
+    
+    <!-- Cyan inner gradient circle -->
+    <circle cx="120" cy="120" r="72" fill="none" stroke="url(#cyanGradient)" stroke-width="2" opacity="0.5"/>
+    
+    <!-- MM Text - Large and Bold - White -->
+    <text x="120" y="130" font-family="'Arial Black', 'Segoe UI', sans-serif" font-size="140" font-weight="900" 
+          text-anchor="middle" fill="#FFFFFF" letter-spacing="-5" dominant-baseline="central">MM</text>
+    
+    <!-- MM cyan glow effect -->
+    <text x="120" y="130" font-family="'Arial Black', 'Segoe UI', sans-serif" font-size="140" font-weight="900" 
+          text-anchor="middle" fill="none" stroke="#00D4FF" stroke-width="1.2" letter-spacing="-5" 
+          dominant-baseline="central" opacity="0.4" filter="url(#glowEffect)"/>
+  </g>
+  
+  <!-- Modern accent elements - cyan -->
+  <g opacity="0.25" filter="url(#glowEffect)">
+    <!-- Top accent circles -->
+    <circle cx="50" cy="45" r="12" fill="#00D4FF"/>
+    <circle cx="190" cy="50" r="8" fill="#0088FF"/>
+    
+    <!-- Bottom accent circles -->
+    <circle cx="45" cy="210" r="8" fill="#0088FF"/>
+    <circle cx="195" cy="215" r="10" fill="#00D4FF"/>
+  </g>
+  
+  <!-- Geometric modern pattern - subtle blue -->
+  <g stroke="url(#cyanGradient)" stroke-width="0.8" fill="none" opacity="0.1">
+    <!-- Left diagonal lines -->
+    <line x1="30" y1="60" x2="50" y2="45"/>
+    <line x1="25" y1="90" x2="45" y2="75"/>
+    
+    <!-- Right diagonal lines -->
+    <line x1="210" y1="60" x2="190" y2="45"/>
+    <line x1="215" y1="90" x2="195" y2="75"/>
+  </g>
+</svg>
