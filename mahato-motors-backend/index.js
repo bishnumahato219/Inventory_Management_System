@@ -13,7 +13,10 @@ connectDB();
 const app = express();
 
 app.use(cors({
-  origin: "http://localhost:5173", // React default Vite port
+  origin: ""[
+    "http://localhost:5173",
+    "https://inventory-management-system-c2at38hkq.vercel.app"
+  ], // React default Vite port
   credentials: true
 }));
 
