@@ -49,6 +49,25 @@ const ManageBookings = () => {
     }
   };
 
+  const handleDeleteBooking = async (bookingId) => {
+    if (!window.confirm("Are you sure you want to delete this booking?")) {
+      return;
+    }
+
+    try {
+      const response = await API.delete(`/bookings/${bookingId}`);
+      if (response.status === 200) {
+        setBookings((prevBookings) =>
+          prevBookings.filter((b) => b._id !== bookingId)
+        );
+        alert("Booking deleted successfully");
+      }
+    } catch (err) {
+      console.error("Delete failed:", err);
+      alert("Error deleting booking. Check backend console.");
+    }
+  };
+
   const getStatusBadge = (status) => {
     const base =
       "px-3 py-1 rounded-full text-[10px] font-bold uppercase tracking-widest ";
@@ -142,6 +161,16 @@ const ManageBookings = () => {
                         View Invoice
                       </Link>
                     </div>
+                  )}
+
+                  {/* DELETE BUTTON (FOR UNUSED BOOKINGS) */}
+                  {booking.status !== "delivered" && (
+                    <button
+                      onClick={() => handleDeleteBooking(booking._id)}
+                      className="w-full mt-2 px-3 py-2 text-xs font-semibold text-white bg-red-600 rounded-md hover:bg-red-700 transition"
+                    >
+                      Delete
+                    </button>
                   )}
 
                 </td>

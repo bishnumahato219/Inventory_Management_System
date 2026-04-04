@@ -45,8 +45,6 @@ export default function DashboardLayout() {
       { name: "Dashboard", path: "/manager/dashboard", icon: <LayoutDashboard size={20}/> },
       { name: "Manage Cars", path: "/admin/cars", icon: <Car size={20}/> },
       { name: "Stock/Bookings", path: "/manager/stock", icon: <Warehouse size={20}/> },
-      { name: "Sales History", path: "/manager/SalesHistory", icon: <ScrollText size={20}/> },
-      { name: "Purchase Stock", path: "/manager/PurchaseStock", icon: <PackagePlus size={20}/> },
       { name: "Manage Employees", path: "/manager/employees", icon: <UserCircle size={20}/> },
       { name: "Manage Suppliers", path: "/manager/suppliers", icon: <Truck size={20}/> },
       { name: "Stock Management", path: "/manager/StockManagement", icon: <Warehouse size={20}/> },

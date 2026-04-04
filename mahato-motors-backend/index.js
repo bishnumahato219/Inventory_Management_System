@@ -3,6 +3,9 @@ const dotenv = require("dotenv");
 const cors = require("cors");
 const connectDB = require("./config/db");
 const dashboardRoutes = require("./routes/dashboardRoutes");
+const dns = require("dns");
+
+dns.setServers(["1.1.1.1", "8.8.8.8"]);
 
 dotenv.config();
 connectDB();

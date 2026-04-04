@@ -5,7 +5,6 @@ import { Search, ArrowRight, Zap, ShieldCheck } from "lucide-react";
 
 // REMOVED the CSS string from the array to prevent the crash
 const slides = [
-  "https://instagram.fdbd5-1.fna.fbcdn.net/v/t51.82787-15/621753561_18192071008352376_2038896646433977071_n.jpg?stp=dst-jpg_e35_tt6&_nc_cat=103&ig_cache_key=MjQ2MzAyNjQxNDQ5ODkzODk2OA%3D%3D.3-ccb7-5&ccb=7-5&_nc_sid=58cdad&efg=eyJ2ZW5jb2RlX3RhZyI6InhwaWRzLjc1MHg3Mzkuc2RyLkMzIn0%3D&_nc_ohc=fc2iBi9Aj-kQ7kNvwGnSxen&_nc_oc=Adm5zyW-yY-vJcgnHV0t-xDJtSTGBkHjHaUDgB5xJdJsL7wtRsb7vr12oAxcn4brMOVBwquqRXMDTkRgvojW8b4P&_nc_ad=z-m&_nc_cid=2034&_nc_zt=23&_nc_ht=instagram.fdbd5-1.fna&_nc_gid=rxvxZfzJW7__BUpOGmCkiw&oh=00_AfuY_DxsftbUXmn5Tksn-chlK-CSwvGSAGQytA-6mqnDgQ&oe=69A3D94F",
   "https://i.pinimg.com/736x/b1/7e/6f/b17e6f4f9eb49d3c2bd46dac19dbe626.jpg",
   "https://i.pinimg.com/736x/cc/e6/19/cce61947ae34b19ca75def3d0c15c456.jpg",
   "https://img.indianautosblog.com/resize/750x-/2018/04/2018-Maruti-Ertiga-Suzuki-Ertiga-front-angle.jpg",

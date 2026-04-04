@@ -27,12 +27,10 @@ import ManageBookings from "../pages/admin/ManageBookings";
 
 
 // Manager Management
-import SalesHistory from "../pages/manager/SalesHistory";
 import ManageEmployees from "../pages/manager/ManageEmployees";
 import ManageSuppliers from "../pages/manager/ManageSuppliers";
 import Reports from "../pages/manager/Reports";
 import Settings from "../pages/manager/Settings";
-import PurchaseStock from "../pages/manager/PurchaseStock";
 import StockManagement from "../pages/manager/StockManagement";
 
 // customer
@@ -93,12 +91,10 @@ export default function AppRoutes() {
           </ProtectedRoute>
         } />
         <Route path="/manager/stock" element={<ManageBookings />} />
-        <Route path="/manager/SalesHistory" element={<SalesHistory />} />
         <Route path="/manager/employees" element={<ManageEmployees />} />
         <Route path="/manager/suppliers" element={<ManageSuppliers />} />
         <Route path="/manager/reports" element={<Reports />} />
         <Route path="/manager/settings" element={<Settings />} />
-        <Route path="/manager/purchaseStock" element={<PurchaseStock />} />
         <Route path="/manager/StockManagement" element={<StockManagement />} />
 
         {/* Employee Section */}
