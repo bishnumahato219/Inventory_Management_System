@@ -1,35 +1,21 @@
 import React, { useEffect, useState } from "react";
 import API from "../../api/axios";
-import {
-  Users,
-  UserMinus,
-  RefreshCw,
-  Shield,
-  Briefcase,
-  User,
-  PlusCircle,
-  X,
+import { 
+  Users, UserMinus, RefreshCw, Shield, 
+  Briefcase, User as UserIcon, PlusCircle, X, Mail, Phone 
 } from "lucide-react";
 
 export default function ManageUsers() {
   const [users, setUsers] = useState([]);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState("");
-
   const [showForm, setShowForm] = useState(false);
   const [formData, setFormData] = useState({
-    name: "",
-    email: "",
-    password: "",
-    phone: "",
-    role: "employee",
+    name: "", email: "", password: "", phone: "", role: "employee",
   });
 
-  useEffect(() => {
-    fetchUsers();
-  }, []);
+  useEffect(() => { fetchUsers(); }, []);
 
-  // ================= FETCH USERS =================
   const fetchUsers = async () => {
     try {
       setLoading(true);
@@ -37,260 +23,163 @@ export default function ManageUsers() {
       setUsers(res.data);
       setError("");
     } catch (err) {
-      console.error(err);
       setError("Administrative access required.");
     } finally {
       setLoading(false);
     }
   };
 
-  // ================= HANDLE INPUT =================
   const handleChange = (e) => {
-    setFormData({
-      ...formData,
-      [e.target.name]: e.target.value,
-    });
+    setFormData({ ...formData, [e.target.name]: e.target.value });
   };
 
-  // ================= CREATE USER =================
   const createUser = async (e) => {
     e.preventDefault();
-
     try {
-      let endpoint = "";
-
-      if (formData.role === "manager") {
-        endpoint = "/users/create-manager";
-      } else if (formData.role === "employee") {
-        endpoint = "/users/create-employee";
-      } else {
-        alert("Only Manager and Employee creation allowed.");
-        return;
-      }
-
-      const res = await API.post(endpoint, {
-        name: formData.name,
-        email: formData.email,
-        password: formData.password,
-        phone: formData.phone,
-      });
-
-      // Add new user to table instantly
+      let endpoint = formData.role === "manager" ? "/users/create-manager" : "/users/create-employee";
+      const res = await API.post(endpoint, formData);
       setUsers([...users, res.data.user]);
-
       setShowForm(false);
-      setFormData({
-        name: "",
-        email: "",
-        password: "",
-        phone: "",
-        role: "employee",
-      });
-
+      setFormData({ name: "", email: "", password: "", phone: "", role: "employee" });
     } catch (err) {
-      console.error("CREATE USER ERROR:", err.response?.data || err.message);
       alert(err.response?.data?.message || "User creation failed.");
     }
   };
 
-  // ================= DELETE USER =================
   const deleteUser = async (id) => {
-    if (!window.confirm("Are you sure you want to delete this user?")) return;
-
+    if (!window.confirm("Revoke access for this user?")) return;
     try {
       await API.delete(`/users/${id}`);
       setUsers(users.filter((u) => u._id !== id));
     } catch (err) {
-      console.error(err);
       alert("Deletion failed.");
     }
   };
 
-  // ================= ROLE BADGE =================
   const getRoleBadge = (role) => {
+    const base = "inline-flex items-center gap-1 px-3 py-1 rounded-full text-[10px] font-black uppercase border ";
     switch (role) {
-      case "admin":
-        return {
-          style: "bg-purple-50 text-purple-600 border-purple-100",
-          icon: <Shield size={12} />,
-        };
-      case "manager":
-        return {
-          style: "bg-blue-50 text-blue-600 border-blue-100",
-          icon: <Briefcase size={12} />,
-        };
-      default:
-        return {
-          style: "bg-green-50 text-green-600 border-green-100",
-          icon: <User size={12} />,
-        };
+      case "admin": return { style: base + "bg-purple-50 text-purple-600 border-purple-100", icon: <Shield size={12} /> };
+      case "manager": return { style: base + "bg-blue-50 text-blue-600 border-blue-100", icon: <Briefcase size={12} /> };
+      default: return { style: base + "bg-green-50 text-green-600 border-green-100", icon: <UserIcon size={12} /> };
     }
   };
 
   return (
-    <div className="space-y-8">
-      {/* ================= HEADER ================= */}
-      <div className="flex justify-between items-center">
+    <div className="p-4 md:p-0 space-y-8">
+      {/* HEADER SECTION */}
+      <div className="flex flex-col sm:flex-row justify-between items-start sm:items-center gap-4">
         <div>
-          <h1 className="text-3xl font-bold">
+          <h1 className="text-3xl font-black uppercase tracking-tighter">
             Staff <span className="text-orange-600">Permissions</span>
           </h1>
-          <p className="text-gray-500 text-sm">
-            Manage managers and employees.
-          </p>
+          <p className="text-gray-400 text-xs font-bold uppercase tracking-widest mt-1">Manage access control</p>
         </div>
 
-        <div className="flex gap-3">
+        <div className="flex gap-2 w-full sm:w-auto">
           <button
             onClick={() => setShowForm(!showForm)}
-            className="flex items-center gap-2 bg-orange-600 text-white px-5 py-2 rounded-lg text-sm"
+            className="flex-1 sm:flex-none flex items-center justify-center gap-2 bg-orange-600 text-white px-5 py-3 rounded-2xl text-xs font-black uppercase transition-all shadow-lg shadow-orange-600/20"
           >
             {showForm ? <X size={16} /> : <PlusCircle size={16} />}
-            {showForm ? "Close" : "Add User"}
+            {showForm ? "Cancel" : "Add Staff"}
           </button>
-
-          <button
-            onClick={fetchUsers}
-            className="flex items-center gap-2 bg-black text-white px-5 py-2 rounded-lg text-sm"
-          >
-            <RefreshCw size={16} className={loading ? "animate-spin" : ""} />
-            Sync
+          <button onClick={fetchUsers} className="bg-slate-900 text-white p-3 rounded-2xl">
+            <RefreshCw size={18} className={loading ? "animate-spin" : ""} />
           </button>
         </div>
       </div>
 
-      {/* ================= ERROR ================= */}
-      {error && (
-        <div className="bg-red-100 text-red-600 p-3 rounded">
-          {error}
-        </div>
-      )}
-
-      {/* ================= FORM ================= */}
+      {/* FORM SECTION - Responsive Grid */}
       {showForm && (
-        <div className="bg-white p-6 rounded-xl shadow border">
-          <form onSubmit={createUser} className="grid md:grid-cols-2 gap-4">
-            <input
-              type="text"
-              name="name"
-              placeholder="Full Name"
-              value={formData.name}
-              onChange={handleChange}
-              required
-              className="p-3 border rounded"
-            />
-
-            <input
-              type="email"
-              name="email"
-              placeholder="Email"
-              value={formData.email}
-              onChange={handleChange}
-              required
-              className="p-3 border rounded"
-            />
-
-            <input
-              type="password"
-              name="password"
-              placeholder="Password"
-              value={formData.password}
-              onChange={handleChange}
-              required
-              className="p-3 border rounded"
-            />
-
-            <input
-              type="text"
-              name="phone"
-              placeholder="Phone Number"
-              value={formData.phone}
-              onChange={handleChange}
-              required
-              className="p-3 border rounded"
-            />
-
-            <select
-              name="role"
-              value={formData.role}
-              onChange={handleChange}
-              className="p-3 border rounded"
-            >
-              <option value="manager">Manager</option>
-              <option value="employee">Employee</option>
-            </select>
-
-            <button
-              type="submit"
-              className="md:col-span-2 bg-black text-white py-3 rounded font-semibold"
-            >
-              Create User
+        <div className="bg-white p-6 md:p-8 rounded-[2.5rem] shadow-xl border border-slate-100 animate-in fade-in slide-in-from-top-4">
+          <form onSubmit={createUser} className="grid grid-cols-1 md:grid-cols-2 gap-4">
+            <div className="space-y-1">
+              <label className="text-[10px] font-black uppercase text-slate-400 ml-2">Full Name</label>
+              <input type="text" name="name" value={formData.name} onChange={handleChange} required className="w-full p-4 bg-slate-50 border-none rounded-2xl text-sm" />
+            </div>
+            <div className="space-y-1">
+              <label className="text-[10px] font-black uppercase text-slate-400 ml-2">Email Address</label>
+              <input type="email" name="email" value={formData.email} onChange={handleChange} required className="w-full p-4 bg-slate-50 border-none rounded-2xl text-sm" />
+            </div>
+            <div className="space-y-1">
+              <label className="text-[10px] font-black uppercase text-slate-400 ml-2">Contact Number</label>
+              <input type="text" name="phone" value={formData.phone} onChange={handleChange} required className="w-full p-4 bg-slate-50 border-none rounded-2xl text-sm" />
+            </div>
+            <div className="space-y-1">
+              <label className="text-[10px] font-black uppercase text-slate-400 ml-2">Assigned Role</label>
+              <select name="role" value={formData.role} onChange={handleChange} className="w-full p-4 bg-slate-50 border-none rounded-2xl text-sm appearance-none">
+                <option value="manager">Manager</option>
+                <option value="employee">Employee</option>
+              </select>
+            </div>
+            <div className="space-y-1 md:col-span-2">
+              <label className="text-[10px] font-black uppercase text-slate-400 ml-2">Access Password</label>
+              <input type="password" name="password" value={formData.password} onChange={handleChange} required className="w-full p-4 bg-slate-50 border-none rounded-2xl text-sm" />
+            </div>
+            <button type="submit" className="md:col-span-2 bg-orange-600 text-white py-4 rounded-2xl font-black uppercase tracking-widest text-xs mt-2">
+              Finalize Staff Credentials
             </button>
           </form>
         </div>
       )}
 
-      {/* ================= TABLE ================= */}
-      <div className="bg-white rounded-xl shadow border overflow-hidden">
-        <div className="p-4 border-b flex items-center gap-2">
-          <Users size={18} />
-          <span className="font-semibold text-sm uppercase">
-            Authorized Users
-          </span>
-        </div>
-
+      {/* DESKTOP TABLE VIEW */}
+      <div className="hidden md:block bg-white rounded-[2.5rem] shadow-xl border border-slate-100 overflow-hidden">
         <table className="w-full text-left">
-          <thead className="text-xs text-gray-500 uppercase border-b">
+          <thead className="text-[10px] font-black text-slate-400 uppercase tracking-widest border-b">
             <tr>
-              <th className="p-4">Name</th>
-              <th className="p-4">Email</th>
-              <th className="p-4">Role</th>
-              <th className="p-4 text-right">Action</th>
+              <th className="p-6">Member</th>
+              <th className="p-6">Contact Info</th>
+              <th className="p-6">Access Level</th>
+              <th className="p-6 text-right">Action</th>
             </tr>
           </thead>
-
           <tbody>
-            {loading ? (
-              <tr>
-                <td colSpan="4" className="p-8 text-center">
-                  Loading...
-                </td>
-              </tr>
-            ) : users.length === 0 ? (
-              <tr>
-                <td colSpan="4" className="p-8 text-center">
-                  No users found.
-                </td>
-              </tr>
-            ) : (
-              users.map((u) => {
-                const badge = getRoleBadge(u.role);
-                return (
-                  <tr key={u._id} className="border-b hover:bg-gray-50">
-                    <td className="p-4 font-medium">{u.name}</td>
-                    <td className="p-4">{u.email}</td>
-                    <td className="p-4">
-                      <span
-                        className={`inline-flex items-center gap-1 px-3 py-1 rounded-full text-xs font-bold border ${badge.style}`}
-                      >
-                        {badge.icon}
-                        {u.role}
-                      </span>
-                    </td>
-                    <td className="p-4 text-right">
-                      <button
-                        onClick={() => deleteUser(u._id)}
-                        className="p-2 bg-red-100 text-red-600 rounded hover:bg-red-600 hover:text-white"
-                      >
-                        <UserMinus size={16} />
-                      </button>
-                    </td>
-                  </tr>
-                );
-              })
-            )}
+            {users.map((u) => {
+              const badge = getRoleBadge(u.role);
+              return (
+                <tr key={u._id} className="border-b last:border-0 hover:bg-slate-50 transition-colors">
+                  <td className="p-6 font-black text-slate-800 uppercase text-sm">{u.name}</td>
+                  <td className="p-6 text-xs text-slate-500 font-medium">{u.email}</td>
+                  <td className="p-6"><span className={badge.style}>{badge.icon}{u.role}</span></td>
+                  <td className="p-6 text-right">
+                    <button onClick={() => deleteUser(u._id)} className="p-3 bg-red-50 text-red-600 rounded-xl hover:bg-red-600 hover:text-white transition-all">
+                      <UserMinus size={18} />
+                    </button>
+                  </td>
+                </tr>
+              );
+            })}
           </tbody>
         </table>
+      </div>
+
+      {/* MOBILE CARD VIEW */}
+      <div className="grid grid-cols-1 gap-4 md:hidden">
+        {users.map((u) => {
+          const badge = getRoleBadge(u.role);
+          return (
+            <div key={u._id} className="bg-white p-6 rounded-[2rem] shadow-sm border border-slate-100 space-y-4">
+              <div className="flex justify-between items-start">
+                <div className="flex gap-3">
+                  <div className="bg-slate-100 p-3 rounded-2xl text-slate-600"><UserIcon size={20}/></div>
+                  <div>
+                    <h4 className="font-black text-slate-800 uppercase text-sm">{u.name}</h4>
+                    <span className={badge.style + " mt-1"}>{badge.icon}{u.role}</span>
+                  </div>
+                </div>
+                <button onClick={() => deleteUser(u._id)} className="p-3 bg-red-50 text-red-500 rounded-xl">
+                  <UserMinus size={18} />
+                </button>
+              </div>
+              <div className="space-y-2 pt-2 border-t border-slate-50">
+                <div className="flex items-center gap-2 text-xs text-slate-500"><Mail size={14} /> {u.email}</div>
+                <div className="flex items-center gap-2 text-xs text-slate-500"><Phone size={14} /> {u.phone || "No phone registered"}</div>
+              </div>
+            </div>
+          );
+        })}
       </div>
     </div>
   );

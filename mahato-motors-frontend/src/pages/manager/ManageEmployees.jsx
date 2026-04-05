@@ -1,21 +1,16 @@
 import React, { useState, useEffect } from "react";
 import API from "../../api/axios";
-import { UserPlus, Mail, Phone, ShieldCheck, UserCircle, X } from "lucide-react";
+import { UserPlus, Mail, Phone, ShieldCheck, UserCircle, X, Loader2 } from "lucide-react";
 
 const ManageEmployees = () => {
   const [users, setUsers] = useState([]);
   const [loading, setLoading] = useState(true);
   const [isModalOpen, setIsModalOpen] = useState(false);
   const [formData, setFormData] = useState({
-    name: "",
-    email: "",
-    password: "",
-    phone: "",
+    name: "", email: "", password: "", phone: "",
   });
 
-  useEffect(() => {
-    fetchUsers();
-  }, []);
+  useEffect(() => { fetchUsers(); }, []);
 
   const fetchUsers = async () => {
     try {
@@ -43,31 +38,34 @@ const ManageEmployees = () => {
   };
 
   if (loading) return (
-    <div className="flex h-screen items-center justify-center">
-      <div className="animate-pulse font-black text-slate-400 uppercase tracking-widest">Syncing Staff Records...</div>
+    <div className="flex h-64 items-center justify-center">
+      <div className="flex flex-col items-center gap-4">
+        <Loader2 className="h-10 w-10 text-orange-500 animate-spin" />
+        <p className="font-black text-slate-400 uppercase tracking-widest text-[10px]">Syncing Staff Records...</p>
+      </div>
     </div>
   );
 
   return (
-    <div className="p-4 space-y-8">
-      {/* HEADER */}
-      <div className="flex flex-col md:flex-row justify-between items-start md:items-center gap-4">
+    <div className="p-4 md:p-0 space-y-8">
+      {/* HEADER: Stack on mobile, row on desktop */}
+      <div className="flex flex-col sm:flex-row justify-between items-start sm:items-center gap-4">
         <div>
-          <h2 className="text-4xl font-black text-slate-900 uppercase tracking-tighter">
+          <h2 className="text-3xl md:text-4xl font-black text-slate-900 uppercase tracking-tighter">
             Staff <span className="text-orange-600">Operations</span>
           </h2>
-          <p className="text-slate-500 font-medium">Manage dealership access and personnel roles.</p>
+          <p className="text-slate-500 text-xs md:text-sm font-medium">Manage dealership access and personnel roles.</p>
         </div>
         <button
           onClick={() => setIsModalOpen(true)}
-          className="flex items-center gap-2 bg-slate-900 hover:bg-orange-600 text-white px-8 py-4 rounded-2xl font-black uppercase tracking-widest text-xs transition-all shadow-xl active:scale-95"
+          className="w-full sm:w-auto flex items-center justify-center gap-2 bg-slate-900 hover:bg-orange-600 text-white px-8 py-4 rounded-2xl font-black uppercase tracking-widest text-[10px] transition-all shadow-xl active:scale-95"
         >
           <UserPlus size={18} /> Add New Employee
         </button>
       </div>
 
-      {/* STAFF TABLE */}
-      <div className="bg-white rounded-[2.5rem] shadow-xl shadow-slate-200/50 border border-slate-100 overflow-hidden">
+      {/* DESKTOP TABLE VIEW - Hidden on Mobile */}
+      <div className="hidden md:block bg-white rounded-[2.5rem] shadow-xl border border-slate-100 overflow-hidden">
         <table className="w-full text-left border-collapse">
           <thead>
             <tr className="bg-slate-50/50 border-b border-slate-100 text-[10px] font-black text-slate-400 uppercase tracking-widest">
@@ -103,9 +101,7 @@ const ManageEmployees = () => {
                 </td>
                 <td className="p-6">
                   <span className={`inline-flex items-center gap-1.5 px-4 py-1.5 rounded-full text-[10px] font-black uppercase tracking-widest ${
-                    user.role === "manager" 
-                      ? "bg-purple-50 text-purple-600" 
-                      : "bg-blue-50 text-blue-600"
+                    user.role === "manager" ? "bg-purple-50 text-purple-600" : "bg-blue-50 text-blue-600"
                   }`}>
                     <ShieldCheck size={12} /> {user.role}
                   </span>
@@ -119,72 +115,69 @@ const ManageEmployees = () => {
         </table>
       </div>
 
-      {/* CREATE MODAL */}
-      {isModalOpen && (
-        <div className="fixed inset-0 bg-slate-900/60 backdrop-blur-md flex items-center justify-center z-[100] p-4">
-          <div className="bg-white p-10 rounded-[3rem] w-full max-w-md shadow-2xl relative overflow-hidden">
-            <div className="absolute top-0 right-0 p-8">
-              <button onClick={() => setIsModalOpen(false)} className="text-slate-300 hover:text-orange-600 transition-colors">
-                <X size={24} />
-              </button>
+      {/* MOBILE CARD VIEW - Visible on small screens */}
+      <div className="grid grid-cols-1 gap-4 md:hidden">
+        {users.map((user) => (
+          <div key={user._id} className="bg-white p-6 rounded-[2rem] border border-slate-100 shadow-sm space-y-4">
+            <div className="flex justify-between items-start">
+              <div className="flex gap-3">
+                <div className="bg-slate-100 p-3 rounded-2xl text-slate-400"><UserCircle size={24}/></div>
+                <div>
+                  <h4 className="font-black text-slate-800 uppercase text-sm">{user.name}</h4>
+                  <p className="text-[9px] text-slate-400 font-bold tracking-widest">UID: {user._id.slice(-6)}</p>
+                </div>
+              </div>
+              <span className={`inline-flex items-center gap-1 px-3 py-1 rounded-full text-[9px] font-black uppercase ${
+                user.role === "manager" ? "bg-purple-50 text-purple-600" : "bg-blue-50 text-blue-600"
+              }`}>
+                {user.role}
+              </span>
             </div>
+            <div className="space-y-2 pt-2 border-t border-slate-50">
+              <div className="flex items-center gap-2 text-xs text-slate-500 font-bold"><Mail size={14} /> {user.email}</div>
+              <div className="flex items-center gap-2 text-xs text-slate-500 font-bold"><Phone size={14} /> {user.phone}</div>
+            </div>
+          </div>
+        ))}
+      </div>
 
-            <h2 className="text-3xl font-black text-slate-900 uppercase tracking-tighter mb-2">New Access</h2>
-            <p className="text-slate-500 font-medium mb-8">Provision a new staff account.</p>
+      {/* RESPONSIVE MODAL */}
+      {isModalOpen && (
+        <div className="fixed inset-0 bg-slate-950/60 backdrop-blur-md flex items-end sm:items-center justify-center z-[100] p-0 sm:p-4">
+          <div className="bg-white w-full max-w-md shadow-2xl overflow-y-auto max-h-[90vh] rounded-t-[2.5rem] sm:rounded-[3rem] p-8 md:p-10 relative">
+            <button onClick={() => setIsModalOpen(false)} className="absolute top-8 right-8 text-slate-300 hover:text-orange-600 transition-colors">
+              <X size={24} />
+            </button>
 
-            <form onSubmit={handleCreateEmployee} className="space-y-5">
-              <div className="space-y-4">
-                <div className="relative">
-                  <label className="text-[10px] font-black text-slate-400 uppercase tracking-widest block mb-2 ml-2">Full Identity</label>
-                  <input
-                    required
-                    type="text"
-                    placeholder="e.g. Rahul Sharma"
-                    className="w-full bg-slate-50 border border-slate-100 p-4 rounded-2xl outline-none focus:ring-2 focus:ring-orange-500 focus:bg-white transition-all font-medium"
-                    onChange={(e) => setFormData({...formData, name: e.target.value})}
-                  />
+            <h2 className="text-3xl font-black text-slate-900 uppercase tracking-tighter mb-1">New Access</h2>
+            <p className="text-slate-500 text-sm font-medium mb-8">Provision staff credentials.</p>
+
+            <form onSubmit={handleCreateEmployee} className="space-y-4 pb-6">
+              <div className="space-y-1">
+                <label className="text-[10px] font-black text-slate-400 uppercase tracking-widest ml-2">Full Identity</label>
+                <input required type="text" placeholder="e.g. Rahul Sharma" className="w-full bg-slate-50 p-4 rounded-2xl text-sm"
+                  onChange={(e) => setFormData({...formData, name: e.target.value})} />
+              </div>
+              <div className="space-y-1">
+                <label className="text-[10px] font-black text-slate-400 uppercase tracking-widest ml-2">Corporate Email</label>
+                <input required type="email" placeholder="name@mahatomotors.com" className="w-full bg-slate-50 p-4 rounded-2xl text-sm"
+                  onChange={(e) => setFormData({...formData, email: e.target.value})} />
+              </div>
+              <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
+                <div className="space-y-1">
+                  <label className="text-[10px] font-black text-slate-400 uppercase tracking-widest ml-2">Phone</label>
+                  <input required type="number" className="w-full bg-slate-50 p-4 rounded-2xl text-sm"
+                    onChange={(e) => setFormData({...formData, phone: e.target.value})} />
                 </div>
-                <div className="relative">
-                  <label className="text-[10px] font-black text-slate-400 uppercase tracking-widest block mb-2 ml-2">Corporate Email</label>
-                  <input
-                    required
-                    type="email"
-                    placeholder="name@mahatomotors.com"
-                    className="w-full bg-slate-50 border border-slate-100 p-4 rounded-2xl outline-none focus:ring-2 focus:ring-orange-500 focus:bg-white transition-all font-medium"
-                    onChange={(e) => setFormData({...formData, email: e.target.value})}
-                  />
-                </div>
-                <div className="grid grid-cols-2 gap-4">
-                  <div>
-                    <label className="text-[10px] font-black text-slate-400 uppercase tracking-widest block mb-2 ml-2">Phone</label>
-                    <input
-                      required
-                      type="number"
-                      className="w-full bg-slate-50 border border-slate-100 p-4 rounded-2xl outline-none focus:ring-2 focus:ring-orange-500 focus:bg-white transition-all font-medium"
-                      onChange={(e) => setFormData({...formData, phone: e.target.value})}
-                    />
-                  </div>
-                  <div>
-                    <label className="text-[10px] font-black text-slate-400 uppercase tracking-widest block mb-2 ml-2">Secret Code</label>
-                    <input
-                      required
-                      type="password"
-                      placeholder="••••••"
-                      className="w-full bg-slate-50 border border-slate-100 p-4 rounded-2xl outline-none focus:ring-2 focus:ring-orange-500 focus:bg-white transition-all font-medium"
-                      onChange={(e) => setFormData({...formData, password: e.target.value})}
-                    />
-                  </div>
+                <div className="space-y-1">
+                  <label className="text-[10px] font-black text-slate-400 uppercase tracking-widest ml-2">Secret Code</label>
+                  <input required type="password" placeholder="••••••" className="w-full bg-slate-50 p-4 rounded-2xl text-sm"
+                    onChange={(e) => setFormData({...formData, password: e.target.value})} />
                 </div>
               </div>
-
-              <div className="flex gap-4 mt-8 pt-4">
-                <button 
-                  type="submit" 
-                  className="flex-1 bg-slate-900 text-white py-4 rounded-2xl font-black uppercase tracking-widest text-xs shadow-xl shadow-slate-200 hover:bg-orange-600 transition-all active:scale-95"
-                >
-                  Create Identity
-                </button>
-              </div>
+              <button type="submit" className="w-full bg-slate-900 text-white py-4 rounded-2xl font-black uppercase tracking-widest text-[10px] shadow-xl hover:bg-orange-600 transition-all mt-4">
+                Create Identity
+              </button>
             </form>
           </div>
         </div>

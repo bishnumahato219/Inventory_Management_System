@@ -1,19 +1,18 @@
 import React, { useState, useEffect } from "react";
 import { useNavigate, Link } from "react-router-dom";
-
-import { Eye, EyeOff, User, Mail, Phone, Lock } from "lucide-react";
-import API from "../../api/axios"; // Using your existing axios instance
+import { Eye, EyeOff, User, Mail, Phone, Lock, ChevronRight } from "lucide-react";
+import API from "../../api/axios";
 
 const slides = [
   {
     url: "https://imgd.aeplcdn.com/1920x1080/n/cw/ec/107543/brezza-exterior-left-front-three-quarter-3.jpeg?isig=0&q=40",
     title: "Premium Experience",
-    desc: "Join the elite circle of automotive excellence."
+    desc: "Join the elite circle of automotive excellence at Mahato Motors."
   },
   {
     url: "https://imgd.aeplcdn.com/1920x1080/n/cw/ec/147201/invicto-exterior-right-rear-three-quarter.jpeg?isig=0&q=40",
     title: "Expert Management",
-    desc: "Precision tools for modern dealership operations."
+    desc: "Precision tools for modern dealership operations and stock control."
   }
 ];
 
@@ -31,7 +30,6 @@ export default function Register() {
     password: "",
   });
 
-  // Smooth Image slider
   useEffect(() => {
     const interval = setInterval(() => {
       setCurrent((prev) => (prev === slides.length - 1 ? 0 : prev + 1));
@@ -49,12 +47,11 @@ export default function Register() {
     setLoading(true);
 
     try {
-      // Replaced fetch with your API axios instance for consistency
-      const res = await API.post("/users/register", form);
-      alert("Registration Successful!");
+      await API.post("/users/register", form);
+      alert("Registration Successful! Redirecting to Identity Portal...");
       navigate("/login");
     } catch (err) {
-      setError(err.response?.data?.message || "Registration failed. Please try again.");
+      setError(err.response?.data?.message || "Registration failed. Verify protocol and try again.");
     } finally {
       setLoading(false);
     }
@@ -63,7 +60,7 @@ export default function Register() {
   return (
     <div className="min-h-screen flex relative overflow-hidden bg-white">
       
-      {/* LEFT VISUAL SECTION */}
+      {/* 1. LEFT VISUAL SECTION - Hidden on Mobile/Tablet (LG breakpoint) */}
       <div className="hidden lg:block lg:w-1/2 relative overflow-hidden bg-slate-900">
         {slides.map((slide, index) => (
           <div
@@ -72,104 +69,94 @@ export default function Register() {
               index === current ? "opacity-60 scale-100" : "opacity-0 scale-110"
             }`}
           >
-            <img src={slide.url} alt="Car" className="w-full h-full object-cover" />
+            <img src={slide.url} alt="Mahato Motors Fleet" className="w-full h-full object-cover" />
           </div>
         ))}
 
-        {/* Branding & Text Overlay */}
-        <div className="absolute inset-0 bg-gradient-to-t from-slate-900 via-transparent to-transparent"></div>
+        <div className="absolute inset-0 bg-gradient-to-t from-slate-950 via-transparent to-transparent"></div>
         
         <div className="absolute bottom-20 left-16 z-20 max-w-md">
-          <h1 className="text-5xl font-black text-white tracking-tighter uppercase mb-2">
+          <h1 className="text-6xl font-black text-white tracking-tighter uppercase mb-2 leading-none">
             Mahato <span className="text-orange-500">Motors.</span>
           </h1>
-          <div className="h-1 w-20 bg-orange-500 mb-6"></div>
-          <h3 className="text-3xl font-bold text-white mb-2 transition-all duration-500">
+          <div className="h-1.5 w-20 bg-orange-500 mb-6 rounded-full"></div>
+          <h3 className="text-3xl font-bold text-white mb-2 transition-all duration-500 tracking-tight">
             {slides[current].title}
           </h3>
-          <p className="text-slate-300 text-lg leading-relaxed">
+          <p className="text-slate-300 text-lg leading-relaxed font-medium">
             {slides[current].desc}
           </p>
           
-          {/* Progress Indicators */}
-          <div className="flex gap-2 mt-8">
+          <div className="flex gap-2 mt-10">
             {slides.map((_, i) => (
-              <div key={i} className={`h-1.5 rounded-full transition-all duration-500 ${i === current ? "w-10 bg-orange-500" : "w-3 bg-slate-600"}`}></div>
+              <div key={i} className={`h-1.5 rounded-full transition-all duration-500 ${i === current ? "w-12 bg-orange-500" : "w-3 bg-slate-700"}`}></div>
             ))}
           </div>
         </div>
       </div>
 
-      {/* RIGHT FORM SECTION */}
-      <div className="w-full lg:w-1/2 flex items-center justify-center p-8 lg:p-16 relative z-10">
-        <div className="w-full max-w-md">
-          <div className="mb-10">
-            <h2 className="text-4xl font-black text-slate-900 tracking-tight">Create Account</h2>
-            <p className="text-slate-500 font-medium mt-2">Join the Mahato Motors dealership team.</p>
+      {/* 2. RIGHT FORM SECTION - Fully Responsive */}
+      <div className="w-full lg:w-1/2 flex items-center justify-center p-6 sm:p-12 md:p-20 bg-slate-50 lg:bg-white">
+        <div className="w-full max-w-md bg-white lg:bg-transparent p-8 md:p-10 lg:p-0 rounded-[2.5rem] lg:rounded-none shadow-2xl shadow-slate-200/50 lg:shadow-none animate-in fade-in slide-in-from-right-4 duration-700">
+          
+          {/* Mobile Header (Hidden on Desktop) */}
+          <div className="lg:hidden mb-10 text-center">
+            <h1 className="text-3xl font-black text-slate-900 tracking-tighter uppercase">
+              Mahato <span className="text-orange-600">Motors.</span>
+            </h1>
+          </div>
+
+          <div className="mb-8 text-center lg:text-left">
+            <h2 className="text-3xl md:text-4xl font-black text-slate-900 tracking-tight uppercase leading-none">
+              Create <span className="text-orange-600">Account</span>
+            </h2>
+            <p className="text-slate-500 font-medium mt-3 text-sm md:text-base italic">Enroll in the dealership ecosystem.</p>
           </div>
 
           {error && (
-            <div className="mb-6 p-4 bg-red-50 border-l-4 border-red-500 text-red-700 text-sm font-medium rounded-r-lg">
-              {error}
+            <div className="mb-6 p-4 bg-red-50 border border-red-100 text-red-600 text-[11px] md:text-xs font-black uppercase tracking-widest rounded-2xl flex items-center gap-3">
+              <span className="shrink-0">⚠️</span> {error}
             </div>
           )}
 
-          <form onSubmit={handleRegister} className="space-y-5">
+          <form onSubmit={handleRegister} className="space-y-4 md:space-y-5">
             <div className="space-y-4">
-              {/* Full Name */}
-              <div className="relative">
-                <User className="absolute left-4 top-1/2 -translate-y-1/2 text-slate-400" size={18} />
-                <input
-                  type="text"
-                  name="name"
-                  placeholder="Full Name"
-                  className="w-full border border-slate-200 pl-12 pr-4 py-4 rounded-2xl bg-slate-50 focus:ring-2 focus:ring-orange-500 focus:bg-white outline-none transition-all font-medium"
-                  onChange={handleChange}
-                  required
-                />
-              </div>
+              {/* Responsive Inputs with Icons */}
+              {[
+                { icon: <User />, name: "name", type: "text", placeholder: "Staff Full Name" },
+                { icon: <Mail />, name: "email", type: "email", placeholder: "Corporate Email" },
+                { icon: <Phone />, name: "phone", type: "number", placeholder: "Contact Number" }
+              ].map((field, idx) => (
+                <div key={idx} className="relative group">
+                  <div className="absolute left-4 top-1/2 -translate-y-1/2 text-slate-400 group-focus-within:text-orange-500 transition-colors">
+                    {React.cloneElement(field.icon, { size: 18 })}
+                  </div>
+                  <input
+                    type={field.type}
+                    name={field.name}
+                    placeholder={field.placeholder}
+                    className="w-full border border-slate-100 pl-12 pr-4 py-3.5 md:py-4 rounded-2xl bg-slate-50 focus:ring-2 focus:ring-orange-500 focus:bg-white outline-none transition-all font-bold text-sm text-slate-800"
+                    onChange={handleChange}
+                    required
+                  />
+                </div>
+              ))}
 
-              {/* Email */}
-              <div className="relative">
-                <Mail className="absolute left-4 top-1/2 -translate-y-1/2 text-slate-400" size={18} />
-                <input
-                  type="email"
-                  name="email"
-                  placeholder="Email Address"
-                  className="w-full border border-slate-200 pl-12 pr-4 py-4 rounded-2xl bg-slate-50 focus:ring-2 focus:ring-orange-500 focus:bg-white outline-none transition-all font-medium"
-                  onChange={handleChange}
-                  required
-                />
-              </div>
-
-              {/* Phone */}
-              <div className="relative">
-                <Phone className="absolute left-4 top-1/2 -translate-y-1/2 text-slate-400" size={18} />
-                <input
-                  type="number"
-                  name="phone"
-                  placeholder="Phone Number"
-                  className="w-full border border-slate-200 pl-12 pr-4 py-4 rounded-2xl bg-slate-50 focus:ring-2 focus:ring-orange-500 focus:bg-white outline-none transition-all font-medium"
-                  onChange={handleChange}
-                  required
-                />
-              </div>
-
-              {/* Password */}
-              <div className="relative">
-                <Lock className="absolute left-4 top-1/2 -translate-y-1/2 text-slate-400" size={18} />
+              {/* Password Field */}
+              <div className="relative group">
+                <Lock className="absolute left-4 top-1/2 -translate-y-1/2 text-slate-400 group-focus-within:text-orange-500 transition-colors" size={18} />
                 <input
                   type={showPassword ? "text" : "password"}
                   name="password"
-                  placeholder="Password"
-                  className="w-full border border-slate-200 pl-12 pr-12 py-4 rounded-2xl bg-slate-50 focus:ring-2 focus:ring-orange-500 focus:bg-white outline-none transition-all font-medium"
+                  placeholder="Security Credential"
+                  className="w-full border border-slate-100 pl-12 pr-12 py-3.5 md:py-4 rounded-2xl bg-slate-50 focus:ring-2 focus:ring-orange-500 focus:bg-white outline-none transition-all font-bold text-sm text-slate-800"
                   onChange={handleChange}
                   required
                 />
                 <button
                   type="button"
                   onClick={() => setShowPassword(!showPassword)}
-                  className="absolute right-4 top-1/2 -translate-y-1/2 text-slate-400 hover:text-orange-500 transition-colors"
+                  className="absolute right-4 top-1/2 -translate-y-1/2 text-slate-400 hover:text-orange-600 transition-colors"
                 >
                   {showPassword ? <EyeOff size={20} /> : <Eye size={20} />}
                 </button>
@@ -179,15 +166,15 @@ export default function Register() {
             <button
               type="submit"
               disabled={loading}
-              className="w-full bg-slate-900 hover:bg-orange-600 transition-all text-white py-4 rounded-2xl font-black text-sm uppercase tracking-widest shadow-xl shadow-orange-200/20 active:scale-[0.98] disabled:opacity-70 disabled:cursor-not-allowed"
+              className="w-full bg-slate-950 hover:bg-orange-600 transition-all text-white py-4 rounded-2xl font-black text-[10px] md:text-xs uppercase tracking-[0.2em] shadow-xl shadow-orange-600/10 active:scale-[0.98] disabled:opacity-50 flex items-center justify-center gap-2 mt-6"
             >
-              {loading ? "Creating Account..." : "Register Now →"}
+              {loading ? "Syncing Identity..." : "Finalize Enrollment"} <ChevronRight size={16} />
             </button>
           </form>
 
-          <p className="mt-8 text-center text-slate-500 font-medium text-sm">
-            Already a member?{" "}
-            <Link to="/login" className="text-orange-600 font-black hover:underline transition-all">
+          <p className="mt-8 text-center text-slate-400 font-black text-[10px] md:text-xs uppercase tracking-widest">
+            Already Registered?{" "}
+            <Link to="/login" className="text-orange-600 border-b-2 border-orange-100 hover:border-orange-600 transition-all ml-1">
               Sign In
             </Link>
           </p>

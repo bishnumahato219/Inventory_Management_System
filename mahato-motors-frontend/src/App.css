@@ -1,42 +1,65 @@
+/* 1. RESET & ROOT OPTIMIZATION */
 #root {
-  max-width: 1280px;
-  margin: 0 auto;
-  padding: 2rem;
-  text-align: center;
+  /* Remove the fixed 1280px width to allow the dashboard to be truly full-screen */
+  width: 100%;
+  min-height: 100vh;
+  margin: 0;
+  padding: 0;
+  /* Switch text-align to left as dashboards rarely look good centered */
+  text-align: left;
+  display: flex;
+  flex-direction: column;
 }
 
+/* 2. LOGO & BRANDING UTILITIES */
 .logo {
-  height: 6em;
-  padding: 1.5em;
+  height: 3em; /* Scaled down for navbar use */
+  padding: 0.5em;
   will-change: filter;
-  transition: filter 300ms;
-}
-.logo:hover {
-  filter: drop-shadow(0 0 2em #646cffaa);
-}
-.logo.react:hover {
-  filter: drop-shadow(0 0 2em #61dafbaa);
+  transition: all 400ms cubic-bezier(0.16, 1, 0.3, 1);
 }
 
+.logo:hover {
+  /* Updated to Mahato Motors Orange branding shadow */
+  filter: drop-shadow(0 0 1.5em rgba(249, 115, 22, 0.4));
+  transform: translateY(-2px);
+}
+
+/* 3. RESPONSIVE ANIMATIONS */
 @keyframes logo-spin {
-  from {
-    transform: rotate(0deg);
-  }
-  to {
-    transform: rotate(360deg);
-  }
+  from { transform: rotate(0deg); }
+  to { transform: rotate(360deg); }
 }
 
 @media (prefers-reduced-motion: no-preference) {
-  a:nth-of-type(2) .logo {
+  .logo-animate {
     animation: logo-spin infinite 20s linear;
   }
 }
 
-.card {
-  padding: 2em;
+/* 4. LAYOUT HELPERS for Mobile/Desktop */
+.container-responsive {
+  @apply max-w-7xl mx-auto px-4 sm:px-6 lg:px-8;
+}
+
+/* 5. VITE CARD REPLACEMENT */
+/* We replace the default .card with a responsive Mahato Motors variant */
+.card-terminal {
+  @apply bg-white rounded-[2rem] p-6 md:p-10 border border-slate-100 shadow-xl transition-all;
 }
 
 .read-the-docs {
-  color: #888;
+  @apply text-slate-400 text-[10px] font-black uppercase tracking-[0.2em] mt-8;
+}
+
+/* 6. MOBILE FIXES */
+@media (max-width: 640px) {
+  #root {
+    /* Add extra padding at the bottom for mobile navigation bars if you use them */
+    padding-bottom: env(safe-area-inset-bottom);
+  }
+  
+  .logo {
+    height: 2.5em;
+  }
 }

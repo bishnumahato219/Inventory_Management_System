@@ -1,6 +1,7 @@
 import { useEffect, useState } from "react";
 import { useParams } from "react-router-dom";
 import API from "../../api/axios";
+import { Printer, Download, Car, User, MapPin } from "lucide-react";
 
 const Invoice = () => {
   const { id } = useParams();
@@ -15,182 +16,179 @@ const Invoice = () => {
       })
       .catch((err) => {
         console.error("Invoice fetch error:", err);
-        alert("Invoice not available");
         setLoading(false);
       });
   }, [id]);
 
-  if (loading) return <p style={{ padding: 40, textAlign: "center" }}>Loading modern invoice...</p>;
-  if (!data) return <p style={{ padding: 40, textAlign: "center" }}>No data found for this invoice.</p>;
+  if (loading) return (
+    <div className="flex h-screen items-center justify-center bg-slate-50">
+      <div className="flex flex-col items-center gap-4">
+        <div className="h-10 w-10 animate-spin rounded-full border-4 border-orange-500 border-t-transparent"></div>
+        <p className="font-black uppercase tracking-widest text-slate-400 text-xs">Generating Audit-Ready Invoice...</p>
+      </div>
+    </div>
+  );
 
-  // SCHEMA DATA BINDING
-  const exShowroom = Number(data.car?.exShowroomPrice) || 0; 
+  if (!data) return <p className="p-20 text-center font-bold text-slate-400">Registry Error: Invoice Data Missing.</p>;
+
+  const exShowroom = Number(data.car?.exShowroomPrice) || 0;
   const onRoadTotal = Number(data.car?.onRoadPrice) || 0;
-  
-  // Calculate additional costs (Registration, Insurance, Handling, etc.)
   const additionalCosts = onRoadTotal - exShowroom;
-
   const invoiceNo = data.invoiceNumber || "INV-" + id.slice(-5).toUpperCase();
   const issueDate = data.deliveryDate 
     ? new Date(data.deliveryDate).toLocaleDateString('en-IN') 
     : new Date().toLocaleDateString('en-IN');
 
   return (
-    <div style={{ background: "#f0f2f5", minHeight: "100vh", padding: "20px 0" }}>
+    <div className="bg-slate-100 min-h-screen py-0 md:py-10 print:bg-white print:py-0">
       
+      {/* 1. PRINT PROTOCOLS */}
       <style>
         {`
           @media print {
-            @page { size: A4; margin: 0; }
-            body { margin: 0; -webkit-print-color-adjust: exact; }
-            body * { visibility: hidden; }
-            .invoice-wrapper, .invoice-wrapper * { visibility: visible; }
-            
-            .invoice-wrapper {
-              position: absolute;
-              left: 0;
-              top: 0;
-              width: 100% !important;
-              height: 100% !important;
+            @page { size: A4; margin: 1cm; }
+            body { background: white; }
+            .no-print { display: none !important; }
+            .invoice-card { 
+              box-shadow: none !important; 
+              border: none !important; 
+              width: 100% !important; 
               margin: 0 !important;
-              padding: 40px !important;
-              box-shadow: none !important;
-              overflow: hidden; 
+              padding: 0 !important;
             }
-            .print-btn { display: none !important; }
           }
         `}
       </style>
 
-      <div
-        className="invoice-wrapper"
-        style={{
-          width: "850px",
-          margin: "0 auto",
-          background: "white",
-          padding: "60px",
-          boxShadow: "0 20px 50px rgba(0,0,0,0.05)",
-          fontFamily: "'Inter', 'Segoe UI', sans-serif",
-          color: "#1a1a1a"
-        }}
-      >
-        {/* TOP ACCENT */}
-        <div style={{ height: "6px", background: "linear-gradient(90deg, #8277a7 0%, #a29bfe 100%)", marginBottom: "40px" }}></div>
+      {/* 2. ACTIONS BAR (Hidden on Print) */}
+      <div className="max-w-[850px] mx-auto mb-6 px-4 no-print flex justify-between items-center pt-6 md:pt-0">
+        <button 
+          onClick={() => window.history.back()}
+          className="text-slate-500 font-bold text-[10px] uppercase tracking-widest hover:text-orange-600 transition-colors"
+        >
+          ← Back to Dashboard
+        </button>
+        <button
+          onClick={() => window.print()}
+          className="flex items-center gap-2 bg-slate-900 text-white px-6 py-3 rounded-xl font-black uppercase tracking-widest text-[10px] shadow-lg hover:bg-orange-600 transition-all active:scale-95"
+        >
+          <Printer size={16} /> Print / Save PDF
+        </button>
+      </div>
 
-        {/* HEADER */}
-        <div style={{ display: "flex", justifyContent: "space-between", alignItems: "flex-start", marginBottom: "50px" }}>
-          <div>
-            <h1 style={{ margin: 0, fontSize: "24px", fontWeight: "800", letterSpacing: "-0.5px" }}>MAHATO MOTORS</h1>
-            <p style={{ margin: "4px 0", fontSize: "13px", color: "#666" }}>Authorized Maruti Suzuki Dealership</p>
-            <div style={{ marginTop: "15px", fontSize: "13px", color: "#888", lineHeight: "1.5" }}>
-              1234 Main Street, Suite 100<br />
-              Kolkata, WB 700001<br />
-              T: +91 98765 43210
+      {/* 3. MAIN INVOICE CARD */}
+      <div className="invoice-card max-w-[850px] mx-auto bg-white shadow-2xl md:rounded-[2.5rem] overflow-hidden border border-slate-200">
+        
+        {/* Branding Accent */}
+        <div className="h-3 bg-gradient-to-r from-slate-900 via-orange-600 to-orange-500"></div>
+
+        <div className="p-8 md:p-16">
+          {/* Header Area */}
+          <div className="flex flex-col md:flex-row justify-between items-start gap-8 mb-12">
+            <div>
+              <h1 className="text-2xl font-black text-slate-900 uppercase tracking-tighter">Mahato <span className="text-orange-600">Motors.</span></h1>
+              <p className="text-[10px] font-black text-slate-400 uppercase tracking-widest mt-1">Authorized Maruti Suzuki Dealer</p>
+              <div className="mt-6 text-xs text-slate-500 space-y-1 font-medium">
+                <p className="flex items-center gap-2"><MapPin size={12} /> NH-33, Gandhinagar Area, Haldia</p>
+                <p>West Bengal, India - 721158</p>
+                <p>GSTIN: 19AAACM1234F1Z5</p>
+              </div>
+            </div>
+            <div className="text-left md:text-right w-full md:w-auto border-t md:border-t-0 pt-6 md:pt-0">
+              <h2 className="text-5xl md:text-7xl font-black text-slate-100 uppercase leading-none mb-4 hidden md:block">INVOICE</h2>
+              <div className="space-y-1">
+                <p className="text-xs font-bold text-slate-900">ID: <span className="font-mono text-slate-500">#{invoiceNo}</span></p>
+                <p className="text-xs font-bold text-slate-900">DATE: <span className="text-slate-500">{issueDate}</span></p>
+                <div className="inline-block bg-green-50 text-green-600 px-3 py-1 rounded-full text-[9px] font-black uppercase tracking-widest border border-green-100 mt-2">
+                  Payment Status: Confirmed
+                </div>
+              </div>
             </div>
           </div>
-          <div style={{ textAlign: "right" }}>
-            <h2 style={{ margin: 0, fontSize: "42px", fontWeight: "300", color: "#8277a7" }}>INVOICE</h2>
-            <div style={{ marginTop: "10px", fontSize: "14px" }}>
-              <p style={{ margin: "2px 0" }}><strong>Invoice:</strong> #{invoiceNo}</p>
-              <p style={{ margin: "2px 0" }}><strong>Date:</strong> {issueDate}</p>
-              <p style={{ margin: "2px 0" }}><strong>Status:</strong> <span style={{ color: "#8277a7", fontWeight: "bold" }}>PAID</span></p>
+
+          {/* Parties Section */}
+          <div className="grid grid-cols-1 md:grid-cols-2 gap-10 py-10 border-y border-slate-100 mb-12">
+            <div>
+              <h3 className="text-[10px] font-black text-orange-600 uppercase tracking-[0.2em] mb-4 flex items-center gap-2">
+                <User size={12} /> Billed To
+              </h3>
+              <p className="text-lg font-black text-slate-900 uppercase tracking-tight">{data.customer?.name || "N/A"}</p>
+              <div className="text-xs text-slate-500 font-medium mt-2 space-y-1">
+                <p>{data.customer?.email}</p>
+                <p>{data.customer?.phone}</p>
+              </div>
+            </div>
+            <div>
+              <h3 className="text-[10px] font-black text-orange-600 uppercase tracking-[0.2em] mb-4 flex items-center gap-2">
+                <Car size={12} /> Asset Details
+              </h3>
+              <p className="text-lg font-black text-slate-900 uppercase tracking-tight">{data.car?.modelName}</p>
+              <p className="text-xs font-bold text-slate-400 uppercase tracking-widest mt-1">{data.car?.variant} | {data.car?.fuelType}</p>
             </div>
           </div>
-        </div>
 
-        {/* INFO SECTION */}
-        <div style={{ display: "flex", marginBottom: "50px", borderTop: "1px solid #eee", paddingTop: "30px" }}>
-          <div style={{ flex: 1 }}>
-            <h3 style={{ fontSize: "11px", textTransform: "uppercase", color: "#8277a7", marginBottom: "12px", letterSpacing: "1px" }}>Customer Details</h3>
-            <p style={{ margin: "0", fontSize: "16px", fontWeight: "600" }}>{data.customer?.name || "Valued Customer"}</p>
-            <p style={{ margin: "4px 0", fontSize: "14px", color: "#555" }}>{data.customer?.phone}</p>
-            <p style={{ margin: "0", fontSize: "14px", color: "#555" }}>{data.customer?.email}</p>
+          {/* Ledger Table */}
+          <div className="overflow-x-auto mb-12">
+            <table className="w-full text-left">
+              <thead>
+                <tr className="bg-slate-50 text-[10px] font-black text-slate-400 uppercase tracking-[0.2em]">
+                  <th className="p-5">Operational Item</th>
+                  <th className="p-5 text-right">Amount (INR)</th>
+                </tr>
+              </thead>
+              <tbody className="divide-y divide-slate-100">
+                <tr>
+                  <td className="p-5">
+                    <p className="font-black text-slate-800 text-sm uppercase">Ex-Showroom Price</p>
+                    <p className="text-[10px] text-slate-400 font-bold uppercase mt-1">Base unit cost for {data.car?.modelName}</p>
+                  </td>
+                  <td className="p-5 text-right font-black text-slate-800 text-sm">
+                    ₹{exShowroom.toLocaleString("en-IN")}
+                  </td>
+                </tr>
+                <tr>
+                  <td className="p-5">
+                    <p className="font-black text-slate-800 text-sm uppercase">Ancillary Charges</p>
+                    <p className="text-[10px] text-slate-400 font-bold uppercase mt-1">Registration, Insurance, RTO & Logistics</p>
+                  </td>
+                  <td className="p-5 text-right font-black text-slate-800 text-sm">
+                    ₹{additionalCosts.toLocaleString("en-IN")}
+                  </td>
+                </tr>
+              </tbody>
+            </table>
           </div>
-          <div style={{ flex: 1 }}>
-             <h3 style={{ fontSize: "11px", textTransform: "uppercase", color: "#8277a7", marginBottom: "12px", letterSpacing: "1px" }}>Vehicle Details</h3>
-             <p style={{ margin: "0", fontSize: "14px" }}><strong>Model:</strong> {data.car?.modelName}</p>
-             <p style={{ margin: "4px 0", fontSize: "14px" }}><strong>Variant:</strong> {data.car?.variant}</p>
-             <p style={{ margin: "0", fontSize: "14px" }}><strong>Specs:</strong> {data.car?.fuelType} | {data.car?.color}</p>
-          </div>
-        </div>
 
-        {/* PRICING TABLE */}
-        <table width="100%" style={{ borderCollapse: "collapse", marginBottom: "40px" }}>
-          <thead>
-            <tr style={{ textAlign: "left", background: "#f8f9fa" }}>
-              <th style={{ padding: "15px", fontSize: "12px", textTransform: "uppercase", color: "#666", borderBottom: "2px solid #eee" }}>Description</th>
-              <th style={{ padding: "15px", fontSize: "12px", textTransform: "uppercase", color: "#666", borderBottom: "2px solid #eee", textAlign: "right" }}>Amount</th>
-            </tr>
-          </thead>
-          <tbody>
-            <tr>
-              <td style={{ padding: "25px 15px", borderBottom: "1px solid #f0f0f0" }}>
-                <div style={{ fontWeight: "600", fontSize: "15px" }}>Ex-Showroom Price</div>
-                <div style={{ fontSize: "12px", color: "#888", marginTop: "4px" }}>Base vehicle cost for {data.car?.modelName} (SKU: {data.car?.sku})</div>
-              </td>
-              <td style={{ padding: "25px 15px", borderBottom: "1px solid #f0f0f0", textAlign: "right", fontWeight: "600" }}>
-                ₹{exShowroom.toLocaleString("en-IN")}
-              </td>
-            </tr>
-            <tr>
-              <td style={{ padding: "25px 15px", borderBottom: "1px solid #f0f0f0" }}>
-                <div style={{ fontWeight: "600", fontSize: "15px" }}>Additional Costs</div>
-                <div style={{ fontSize: "12px", color: "#888", marginTop: "4px" }}>Registration, Insurance, RTO, and Taxes</div>
-              </td>
-              <td style={{ padding: "25px 15px", borderBottom: "1px solid #f0f0f0", textAlign: "right", fontWeight: "600" }}>
-                ₹{additionalCosts.toLocaleString("en-IN")}
-              </td>
-            </tr>
-          </tbody>
-        </table>
-
-        {/* TOTALS */}
-        <div style={{ display: "flex", justifyContent: "space-between", alignItems: "flex-end" }}>
-          <div style={{ maxWidth: "40%" }}>
-            <h4 style={{ fontSize: "12px", color: "#8277a7", textTransform: "uppercase", marginBottom: "10px" }}>Company Disclaimer</h4>
-            <p style={{ fontSize: "12px", color: "#777", lineHeight: "1.6", margin: 0 }}>
-              This invoice confirms the final On-Road price for the vehicle. 
-              Barcode: {data.car?.barcode}.
-            </p>
-          </div>
-          <div style={{ width: "320px" }}>
-            <div style={{ display: "flex", justifyContent: "space-between", padding: "10px 0", borderBottom: "1px solid #eee" }}>
-              <span style={{ fontSize: "14px", color: "#666" }}>Ex-Showroom</span>
-              <span style={{ fontSize: "14px", fontWeight: "600" }}>₹{exShowroom.toLocaleString("en-IN")}</span>
+          {/* Grand Total Footer */}
+          <div className="flex flex-col md:flex-row justify-between items-end gap-10">
+            <div className="max-w-xs text-left w-full md:w-auto order-2 md:order-1">
+              <h4 className="text-[9px] font-black text-slate-400 uppercase tracking-widest mb-3">Disclaimer & Terms</h4>
+              <p className="text-[9px] text-slate-400 font-medium leading-relaxed italic uppercase">
+                This document serves as the final commercial settlement for asset identification {data.car?.barcode}. 
+                No manual signature is required as this is an electronically verified record.
+              </p>
             </div>
-            <div style={{ display: "flex", justifyContent: "space-between", padding: "10px 0", borderBottom: "2px solid #1a1a1a" }}>
-              <span style={{ fontSize: "14px", color: "#666" }}>Add. Charges</span>
-              <span style={{ fontSize: "14px", fontWeight: "600" }}>₹{additionalCosts.toLocaleString("en-IN")}</span>
-            </div>
-            <div style={{ display: "flex", justifyContent: "space-between", padding: "25px 0", alignItems: "center" }}>
-              <span style={{ fontSize: "16px", fontWeight: "800" }}>ON-ROAD TOTAL</span>
-              <span style={{ fontSize: "28px", fontWeight: "800", color: "#8277a7" }}>₹{onRoadTotal.toLocaleString("en-IN")}</span>
+            <div className="w-full md:w-80 order-1 md:order-2">
+              <div className="flex justify-between py-3 border-b border-slate-50">
+                <span className="text-[10px] font-black text-slate-400 uppercase">Sub-Total</span>
+                <span className="text-sm font-bold text-slate-600">₹{exShowroom.toLocaleString("en-IN")}</span>
+              </div>
+              <div className="flex justify-between py-3 border-b-2 border-slate-900">
+                <span className="text-[10px] font-black text-slate-400 uppercase">Ancillary Total</span>
+                <span className="text-sm font-bold text-slate-600">₹{additionalCosts.toLocaleString("en-IN")}</span>
+              </div>
+              <div className="flex justify-between py-6 items-center">
+                <span className="text-xs font-black text-slate-900 uppercase tracking-tighter">On-Road Total</span>
+                <span className="text-3xl font-black text-orange-600">₹{onRoadTotal.toLocaleString("en-IN")}</span>
+              </div>
             </div>
           </div>
-        </div>
 
-        {/* FOOTER */}
-        <div style={{ marginTop: "60px", textAlign: "center", borderTop: "1px solid #eee", paddingTop: "30px" }}>
-          <p style={{ fontSize: "18px", color: "#8277a7", fontWeight: "300", margin: 0 }}>Safe Travels from Mahato Motors!</p>
-          <p style={{ fontSize: "11px", color: "#aaa", marginTop: "10px" }}>Computer Generated Invoice • No Signature Required</p>
-        </div>
-
-        <div className="print-btn" style={{ textAlign: "center", marginTop: "40px" }}>
-          <button
-            onClick={() => window.print()}
-            style={{
-              padding: "14px 40px",
-              background: "#1a1a1a",
-              color: "white",
-              border: "none",
-              borderRadius: "8px",
-              fontWeight: "600",
-              cursor: "pointer",
-              boxShadow: "0 10px 20px rgba(0,0,0,0.1)"
-            }}
-          >
-            Download Invoice
-          </button>
+          {/* Visual Footer */}
+          <div className="mt-16 pt-8 border-t border-slate-50 text-center">
+            <p className="text-lg font-black text-slate-200 uppercase tracking-[0.3em]">Mahato Motors Haldia</p>
+            <p className="text-[8px] text-slate-300 font-bold uppercase mt-2">© 2026 Audit Sequence Finalized</p>
+          </div>
         </div>
       </div>
     </div>

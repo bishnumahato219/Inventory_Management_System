@@ -53,39 +53,40 @@ const ManageSupplier = () => {
   };
 
   if (loading) return (
-    <div className="flex h-64 items-center justify-center font-black text-slate-400 uppercase tracking-widest text-xs animate-pulse">
+    <div className="flex h-64 items-center justify-center font-black text-slate-400 uppercase tracking-widest text-[10px] md:text-xs animate-pulse">
       Syncing Supplier Intelligence...
     </div>
   );
 
   return (
-    <div className="space-y-8 animate-in fade-in duration-500">
+    <div className="p-4 md:p-0 space-y-6 md:space-y-8 animate-in fade-in duration-500">
+      
       {/* HEADER SECTION */}
-      <div className="flex flex-col md:flex-row justify-between items-start md:items-center gap-4">
+      <div className="flex flex-col sm:flex-row justify-between items-start sm:items-center gap-6">
         <div>
-          <h1 className="text-4xl font-black text-slate-900 uppercase tracking-tighter">
+          <h1 className="text-3xl md:text-4xl font-black text-slate-900 uppercase tracking-tighter">
             Supplier <span className="text-orange-600">Network</span>
           </h1>
-          <p className="text-slate-500 font-medium mt-1">Manage institutional procurement and vendor relationships.</p>
+          <p className="text-slate-500 text-xs md:text-sm font-medium mt-1">Institutional procurement and vendor relationships.</p>
         </div>
-        <div className="flex gap-3">
+        <div className="flex w-full sm:w-auto gap-3">
           <button 
             onClick={fetchSuppliers}
-            className="p-3 bg-white border border-slate-100 text-slate-400 hover:text-orange-600 rounded-2xl transition-all shadow-sm"
+            className="flex-1 sm:flex-none p-3 bg-white border border-slate-100 text-slate-400 hover:text-orange-600 rounded-2xl transition-all shadow-sm flex justify-center"
           >
             <RefreshCcw size={20} className={loading ? "animate-spin" : ""} />
           </button>
           <button
             onClick={() => setIsModalOpen(true)}
-            className="bg-slate-900 hover:bg-orange-600 text-white px-6 py-3 rounded-2xl font-black uppercase tracking-widest text-[10px] shadow-xl transition-all active:scale-95 flex items-center gap-2"
+            className="flex-[3] sm:flex-none bg-slate-900 hover:bg-orange-600 text-white px-5 md:px-6 py-3 rounded-2xl font-black uppercase tracking-widest text-[9px] md:text-[10px] shadow-xl transition-all active:scale-95 flex items-center justify-center gap-2"
           >
             <Plus size={16} /> Register Vendor
           </button>
         </div>
       </div>
 
-      {/* TABLE LEDGER */}
-      <div className="bg-white rounded-[2.5rem] border border-slate-100 shadow-xl shadow-slate-200/50 overflow-hidden">
+      {/* TABLE LEDGER - Hidden on Mobile, Visible on Desktop */}
+      <div className="hidden md:block bg-white rounded-[2.5rem] border border-slate-100 shadow-xl shadow-slate-200/50 overflow-hidden">
         <div className="overflow-x-auto">
           <table className="w-full text-left">
             <thead className="bg-slate-50/50 text-[10px] font-black text-slate-400 uppercase tracking-widest border-b border-slate-100">
@@ -136,35 +137,72 @@ const ManageSupplier = () => {
                   </td>
                 </tr>
               ))}
-              {suppliers.length === 0 && (
-                <tr>
-                  <td colSpan="5" className="p-20 text-center font-bold text-slate-300 uppercase tracking-widest text-xs">
-                    No vendor records detected in registry.
-                  </td>
-                </tr>
-              )}
             </tbody>
           </table>
         </div>
       </div>
 
+      {/* MOBILE CARD VIEW - Visible on Mobile, Hidden on Desktop */}
+      <div className="md:hidden space-y-4">
+        {suppliers.map((s) => (
+          <div key={s._id} className="bg-white p-6 rounded-[2rem] border border-slate-100 shadow-lg relative overflow-hidden">
+            <div className="flex items-center gap-4 mb-4">
+              <div className="bg-slate-50 p-3 rounded-xl text-orange-600">
+                <Building2 size={20} />
+              </div>
+              <div>
+                <p className="text-sm font-black text-slate-800 uppercase tracking-tight">{s.name}</p>
+                <p className="text-[10px] font-bold text-slate-400 uppercase tracking-widest flex items-center gap-1">
+                  <User size={10} /> {s.contactPerson || "N/A"}
+                </p>
+              </div>
+            </div>
+            
+            <div className="grid grid-cols-1 gap-3 pt-4 border-t border-slate-50">
+              <div className="flex items-center gap-3 text-xs font-bold text-slate-700">
+                <Phone size={14} className="text-slate-300" /> {s.phone || "N/A"}
+              </div>
+              <div className="flex items-center gap-3 text-xs font-bold text-slate-700">
+                <Mail size={14} className="text-slate-300" /> {s.email || "N/A"}
+              </div>
+              <div className="flex items-start gap-3 text-xs font-medium text-slate-500 leading-relaxed">
+                <MapPin size={14} className="text-slate-300 shrink-0" /> {s.address || "N/A"}
+              </div>
+            </div>
+            
+            <button className="absolute top-6 right-4 p-2 text-slate-300">
+              <MoreVertical size={18} />
+            </button>
+          </div>
+        ))}
+      </div>
+
+      {/* EMPTY STATE */}
+      {suppliers.length === 0 && (
+        <div className="bg-white rounded-[2rem] md:rounded-[2.5rem] p-12 md:p-20 text-center border border-slate-100 shadow-sm">
+          <p className="font-bold text-slate-300 uppercase tracking-widest text-[10px] md:text-xs">
+            No vendor records detected in registry.
+          </p>
+        </div>
+      )}
+
       {/* MODAL OVERLAY */}
       {isModalOpen && (
-        <div className="fixed inset-0 bg-slate-900/60 backdrop-blur-md flex items-center justify-center z-[100] p-4 animate-in fade-in duration-300">
-          <div className="bg-white p-10 rounded-[3rem] w-full max-w-xl shadow-2xl relative">
+        <div className="fixed inset-0 bg-slate-900/60 backdrop-blur-md flex items-center justify-center z-[100] p-4 animate-in fade-in zoom-in duration-300">
+          <div className="bg-white p-6 md:p-10 rounded-[2.5rem] md:rounded-[3rem] w-full max-w-xl max-h-[90vh] overflow-y-auto shadow-2xl relative custom-scrollbar">
             <button 
               onClick={() => setIsModalOpen(false)}
-              className="absolute top-8 right-8 text-slate-300 hover:text-slate-900 transition-colors"
+              className="absolute top-6 right-6 md:top-8 md:right-8 text-slate-300 hover:text-slate-900 transition-colors"
             >
               <X size={24} />
             </button>
             
-            <h2 className="text-2xl font-black text-slate-900 uppercase tracking-tighter mb-8">
+            <h2 className="text-xl md:text-2xl font-black text-slate-900 uppercase tracking-tighter mb-6 md:mb-8">
               Vendor <span className="text-orange-600">Registration</span>
             </h2>
             
-            <form onSubmit={handleSubmit} className="grid grid-cols-2 gap-6">
-              <div className="col-span-2">
+            <form onSubmit={handleSubmit} className="grid grid-cols-1 sm:grid-cols-2 gap-4 md:gap-6">
+              <div className="sm:col-span-2">
                 <label className="text-[10px] font-black text-slate-400 uppercase tracking-widest mb-2 block">Company Identification</label>
                 <input
                   required
@@ -192,7 +230,7 @@ const ManageSupplier = () => {
                   onChange={(e) => setFormData({ ...formData, phone: e.target.value })}
                 />
               </div>
-              <div className="col-span-2">
+              <div className="sm:col-span-2">
                 <label className="text-[10px] font-black text-slate-400 uppercase tracking-widest mb-2 block">Electronic Mail</label>
                 <input
                   type="email"
@@ -201,7 +239,7 @@ const ManageSupplier = () => {
                   onChange={(e) => setFormData({ ...formData, email: e.target.value })}
                 />
               </div>
-              <div className="col-span-2">
+              <div className="sm:col-span-2">
                 <label className="text-[10px] font-black text-slate-400 uppercase tracking-widest mb-2 block">Facility Address</label>
                 <textarea
                   rows="2"
@@ -210,10 +248,10 @@ const ManageSupplier = () => {
                   onChange={(e) => setFormData({ ...formData, address: e.target.value })}
                 ></textarea>
               </div>
-              <div className="col-span-2 pt-4">
+              <div className="sm:col-span-2 pt-4">
                 <button 
                   type="submit" 
-                  className="w-full bg-orange-600 text-white py-4 rounded-2xl font-black uppercase tracking-widest text-xs shadow-xl shadow-orange-600/20 hover:bg-orange-500 transition-all active:scale-95"
+                  className="w-full bg-orange-600 text-white py-4 rounded-2xl font-black uppercase tracking-widest text-[10px] md:text-xs shadow-xl shadow-orange-600/20 hover:bg-orange-500 transition-all active:scale-95"
                 >
                   Save Institutional Record
                 </button>
