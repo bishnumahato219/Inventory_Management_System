@@ -1,7 +1,7 @@
-import React, { useEffect, useState } from "react";
+import React, { useState, useEffect } from "react";
 import API from "../../api/axios";
 import Barcode from "react-barcode";
-import { Plus, Edit3, Trash2, Package, X } from "lucide-react";
+import { Plus, Edit3, Trash2, X, Image as ImageIcon, ChevronDown } from "lucide-react";
 
 const ManageCars = () => {
   const [cars, setCars] = useState([]);
@@ -9,7 +9,8 @@ const ManageCars = () => {
   const [isModalOpen, setIsModalOpen] = useState(false);
   const [editingId, setEditingId] = useState(null);
 
-  const IMAGE_BASE_URL = "http://localhost:5000/";
+  // Production-ready URL logic
+  const RENDER_URL = "https://inventory-management-system-ftg8.onrender.com";
 
   const [formData, setFormData] = useState({
     modelName: "",
@@ -69,7 +70,7 @@ const ManageCars = () => {
   };
 
   const handleDelete = async (id) => {
-    if (window.confirm("Delete this vehicle?")) {
+    if (window.confirm("Delete this vehicle? This action is irreversible.")) {
       try {
         await API.delete(`/cars/${id}`);
         setCars(cars.filter((car) => car._id !== id));
@@ -89,82 +90,99 @@ const ManageCars = () => {
   };
 
   if (loading) return (
-    <div className="flex h-64 items-center justify-center">
-      <div className="animate-bounce text-orange-600 font-black uppercase tracking-widest text-xs">Loading Fleet...</div>
+    <div className="flex h-screen items-center justify-center bg-slate-50">
+      <div className="flex flex-col items-center gap-4">
+        <div className="h-12 w-12 animate-spin rounded-full border-4 border-orange-500 border-t-transparent"></div>
+        <p className="font-black uppercase tracking-widest text-slate-400 text-[10px]">Scanning Fleet Registry...</p>
+      </div>
     </div>
   );
 
   return (
-    <div className="p-4 md:p-0">
-      {/* HEADER: Stack on mobile, row on desktop */}
-      <div className="flex flex-col sm:flex-row justify-between items-start sm:items-center mb-8 gap-4">
+    <div className="p-4 md:p-0 space-y-8 overflow-x-hidden">
+      
+      {/* 1. HEADER SECTION */}
+      <div className="flex flex-col sm:flex-row justify-between items-start sm:items-center gap-6">
         <div>
-          <h2 className="text-3xl font-black text-slate-900 tracking-tight uppercase">
+          <h2 className="text-3xl md:text-4xl font-black text-slate-900 tracking-tighter uppercase">
             Fleet <span className="text-orange-600">Inventory</span>
           </h2>
-          <p className="text-slate-400 text-xs font-bold uppercase tracking-widest">Dealership Stock Control</p>
+          <p className="text-slate-400 text-[10px] md:text-xs font-black uppercase tracking-[0.2em] mt-1">Dealership Stock Control</p>
         </div>
         <button
           onClick={() => { resetForm(); setIsModalOpen(true); }}
-          className="w-full sm:w-auto flex items-center justify-center gap-2 bg-orange-600 hover:bg-orange-700 text-white font-black px-6 py-3 rounded-2xl shadow-lg transition"
+          className="w-full sm:w-auto flex items-center justify-center gap-2 bg-slate-900 hover:bg-orange-600 text-white font-black uppercase tracking-widest text-[10px] px-8 py-4 rounded-2xl shadow-xl transition-all active:scale-95"
         >
-          <Plus size={20} /> Add New Car
+          <Plus size={18} /> Add New Car
         </button>
       </div>
 
-      {/* GRID: 1 col (mobile) -> 2 col (tablet) -> 3 col (desktop) */}
-      <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6">
+      {/* 2. GRID SYSTEM: 1 col (mobile) -> 2 col (tablet) -> 3 col (desktop) */}
+      <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6 md:gap-8">
         {cars.map((car) => (
-          <div key={car._id} className="bg-white rounded-[2rem] border border-slate-100 shadow-sm overflow-hidden flex flex-col group hover:shadow-xl transition-all duration-300">
-            <div className="h-44 md:h-48 bg-slate-100 relative">
+          <div key={car._id} className="bg-white rounded-[2.5rem] border border-slate-100 shadow-xl shadow-slate-200/50 overflow-hidden flex flex-col group hover:shadow-2xl transition-all duration-500">
+            
+            {/* Image Container with Responsive Aspect Ratio */}
+            <div className="h-48 md:h-56 bg-slate-50 relative overflow-hidden">
               <img
-                src={car.image ? `${IMAGE_BASE_URL}${car.image}` : "https://via.placeholder.com/400x250"}
+                src={car.image ? (car.image.startsWith('http') ? car.image : `${RENDER_URL}/${car.image}`.replace(/([^:]\/)\/+/g, "$1")) : "https://via.placeholder.com/400x250?text=No+Image"}
                 alt={car.modelName}
-                className="w-full h-full object-cover"
+                className="w-full h-full object-cover transition-transform duration-700 group-hover:scale-110"
+                onError={(e) => { e.target.src = "https://via.placeholder.com/400x250?text=Asset+NotFound"; }}
               />
               <div className="absolute top-4 right-4">
-                <span className={`text-[10px] font-black px-4 py-1.5 rounded-full shadow-lg ${
-                  car.stock > 0 ? "bg-white text-green-600" : "bg-red-600 text-white"
+                <span className={`text-[9px] font-black px-4 py-2 rounded-full shadow-lg backdrop-blur-md ${
+                  car.stock > 0 ? "bg-white/90 text-green-600" : "bg-red-600 text-white"
                 }`}>
                   {car.stock > 0 ? `${car.stock} IN STOCK` : "SOLD OUT"}
                 </span>
               </div>
             </div>
 
-            <div className="p-6 flex-1 flex flex-col">
-              <h3 className="text-lg font-black text-slate-900 uppercase tracking-tight mb-1">
-                {car.modelName}
-              </h3>
-              <p className="text-[10px] font-black text-slate-400 uppercase tracking-widest mb-4">
-                {car.variant} • {car.fuelType}
-              </p>
-
-              {/* BARCODE - Scaled for mobile */}
-              <div className="bg-slate-50 p-3 rounded-2xl mb-4 overflow-hidden flex justify-center">
-                <Barcode value={car.barcode} height={30} width={1.2} fontSize={10} background="transparent" />
-              </div>
-
-              <div className="space-y-1 mb-6">
-                <p className="text-[10px] text-slate-400 font-bold uppercase">On-Road Pricing</p>
-                <p className="text-2xl font-black text-orange-600">
-                  ₹{car.onRoadPrice?.toLocaleString("en-IN")}
+            <div className="p-6 md:p-8 flex-1 flex flex-col">
+              <div className="mb-4">
+                <h3 className="text-xl font-black text-slate-800 uppercase tracking-tight truncate">
+                  {car.modelName}
+                </h3>
+                <p className="text-[10px] font-black text-slate-400 uppercase tracking-widest mt-1">
+                  {car.variant} • <span className="text-orange-500">{car.fuelType}</span>
                 </p>
               </div>
 
-              <div className="mt-auto flex gap-2">
+              {/* BARCODE - Perfectly Centered and Scaled */}
+              <div className="bg-slate-50/50 p-4 rounded-3xl mb-6 flex justify-center border border-slate-100/50">
+                <div className="mix-blend-multiply opacity-80">
+                  <Barcode value={car.barcode} height={35} width={1.2} fontSize={10} background="transparent" />
+                </div>
+              </div>
+
+              <div className="grid grid-cols-2 gap-4 mb-8">
+                <div>
+                  <p className="text-[9px] text-slate-400 font-black uppercase tracking-widest mb-1">On-Road Price</p>
+                  <p className="text-xl font-black text-slate-900">
+                    ₹{car.onRoadPrice?.toLocaleString("en-IN")}
+                  </p>
+                </div>
+                <div className="text-right">
+                  <p className="text-[9px] text-slate-400 font-black uppercase tracking-widest mb-1">Color Spec</p>
+                  <p className="text-xs font-bold text-slate-700 uppercase">{car.color}</p>
+                </div>
+              </div>
+
+              <div className="mt-auto flex gap-3">
                 <button
                   onClick={() => {
                     setEditingId(car._id);
                     setFormData({ ...car, image: null });
                     setIsModalOpen(true);
                   }}
-                  className="flex-1 flex items-center justify-center gap-2 bg-slate-900 text-white text-[10px] font-black uppercase py-3 rounded-xl hover:bg-slate-800 transition"
+                  className="flex-1 flex items-center justify-center gap-2 bg-slate-50 text-slate-900 text-[10px] font-black uppercase py-4 rounded-2xl hover:bg-slate-900 hover:text-white transition-all duration-300"
                 >
-                  <Edit3 size={14} /> Edit
+                  <Edit3 size={14} /> Edit Asset
                 </button>
                 <button
                   onClick={() => handleDelete(car._id)}
-                  className="px-4 flex items-center justify-center bg-red-50 text-red-600 rounded-xl hover:bg-red-100 transition"
+                  className="px-5 flex items-center justify-center bg-red-50 text-red-600 rounded-2xl hover:bg-red-600 hover:text-white transition-all duration-300"
                 >
                   <Trash2 size={16} />
                 </button>
@@ -174,75 +192,95 @@ const ManageCars = () => {
         ))}
       </div>
 
-      {/* RESPONSIVE MODAL */}
+      {/* 3. MODAL: Bottom-Sheet on Mobile, Center-Card on Desktop */}
       {isModalOpen && (
-        <div className="fixed inset-0 bg-slate-950/60 backdrop-blur-md flex items-end sm:items-center justify-center z-[100] p-0 sm:p-4">
-          <div className="bg-white w-full max-w-lg shadow-2xl overflow-y-auto max-h-[95vh] rounded-t-[2.5rem] sm:rounded-[2.5rem]">
-            <div className="sticky top-0 bg-white p-6 border-b border-slate-50 flex justify-between items-center z-10">
-              <h2 className="text-xl font-black text-slate-900 uppercase">
-                {editingId ? "Update Asset" : "New Entry"}
-              </h2>
-              <button onClick={() => setIsModalOpen(false)} className="p-2 bg-slate-100 rounded-full"><X size={20}/></button>
+        <div className="fixed inset-0 bg-slate-950/60 backdrop-blur-md flex items-end sm:items-center justify-center z-[100] p-0 sm:p-4 animate-in fade-in duration-300">
+          <div className="bg-white w-full max-w-xl shadow-2xl overflow-y-auto max-h-[92vh] rounded-t-[2.5rem] sm:rounded-[3rem] custom-scrollbar">
+            
+            <div className="sticky top-0 bg-white/80 backdrop-blur-md p-6 md:p-8 border-b border-slate-50 flex justify-between items-center z-10">
+              <div>
+                <h2 className="text-xl font-black text-slate-900 uppercase tracking-tighter">
+                  {editingId ? "Update" : "Register"} <span className="text-orange-600">Asset</span>
+                </h2>
+                <p className="text-[9px] font-bold text-slate-400 uppercase tracking-widest">Mahato Motors Inventory Unit</p>
+              </div>
+              <button 
+                onClick={() => setIsModalOpen(false)} 
+                className="p-2 bg-slate-100 text-slate-500 hover:bg-red-50 hover:text-red-600 rounded-full transition-colors"
+              >
+                <X size={20}/>
+              </button>
             </div>
 
-            <form onSubmit={handleSubmit} className="p-6 md:p-8 space-y-4 pb-10">
-              <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
-                <div className="space-y-1">
-                  <label className="text-[10px] font-black uppercase text-slate-400 ml-1">Model Name</label>
-                  <input name="modelName" required className="w-full bg-slate-50 border-none p-4 rounded-2xl text-sm"
+            <form onSubmit={handleSubmit} className="p-6 md:p-10 space-y-6 pb-12">
+              <div className="grid grid-cols-1 sm:grid-cols-2 gap-5">
+                <div className="space-y-2">
+                  <label className="text-[10px] font-black uppercase text-slate-400 ml-2 tracking-widest">Model Name</label>
+                  <input name="modelName" required placeholder="e.g. Swift Dzire" className="w-full bg-slate-50 border-none p-4 rounded-2xl text-sm font-bold focus:ring-2 focus:ring-orange-500 transition-all"
                     value={formData.modelName} onChange={handleInputChange} />
                 </div>
-                <div className="space-y-1">
-                  <label className="text-[10px] font-black uppercase text-slate-400 ml-1">Variant</label>
-                  <input name="variant" required className="w-full bg-slate-50 border-none p-4 rounded-2xl text-sm"
+                <div className="space-y-2">
+                  <label className="text-[10px] font-black uppercase text-slate-400 ml-2 tracking-widest">Variant</label>
+                  <input name="variant" required placeholder="e.g. VXI" className="w-full bg-slate-50 border-none p-4 rounded-2xl text-sm font-bold focus:ring-2 focus:ring-orange-500 transition-all"
                     value={formData.variant} onChange={handleInputChange} />
                 </div>
               </div>
 
-              <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
-                <div className="space-y-1">
-                  <label className="text-[10px] font-black uppercase text-slate-400 ml-1">Fuel Type</label>
-                  <select name="fuelType" className="w-full bg-slate-50 border-none p-4 rounded-2xl text-sm appearance-none"
-                    value={formData.fuelType} onChange={handleInputChange}>
-                    <option value="Petrol">Petrol</option>
-                    <option value="CNG">CNG</option>
-                    <option value="Hybrid">Hybrid</option>
-                    <option value="Diesel">Diesel</option>
-                  </select>
+              <div className="grid grid-cols-1 sm:grid-cols-2 gap-5">
+                <div className="space-y-2">
+                  <label className="text-[10px] font-black uppercase text-slate-400 ml-2 tracking-widest">Fuel System</label>
+                  <div className="relative">
+                    <select name="fuelType" className="w-full bg-slate-50 border-none p-4 rounded-2xl text-sm font-bold appearance-none focus:ring-2 focus:ring-orange-500 transition-all"
+                      value={formData.fuelType} onChange={handleInputChange}>
+                      <option value="Petrol">Petrol</option>
+                      <option value="CNG">CNG</option>
+                      <option value="Hybrid">Hybrid</option>
+                      <option value="Diesel">Diesel</option>
+                    </select>
+                    <ChevronDown className="absolute right-4 top-1/2 -translate-y-1/2 text-slate-400 pointer-events-none" size={16} />
+                  </div>
                 </div>
-                <div className="space-y-1">
-                  <label className="text-[10px] font-black uppercase text-slate-400 ml-1">Color</label>
-                  <input name="color" required className="w-full bg-slate-50 border-none p-4 rounded-2xl text-sm"
+                <div className="space-y-2">
+                  <label className="text-[10px] font-black uppercase text-slate-400 ml-2 tracking-widest">Exterior Color</label>
+                  <input name="color" required placeholder="e.g. Arctic White" className="w-full bg-slate-50 border-none p-4 rounded-2xl text-sm font-bold focus:ring-2 focus:ring-orange-500 transition-all"
                     value={formData.color} onChange={handleInputChange} />
                 </div>
               </div>
 
-              <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
-                <div className="space-y-1">
-                  <label className="text-[10px] font-black uppercase text-slate-400 ml-1">Ex-Showroom</label>
-                  <input name="exShowroomPrice" type="number" required className="w-full bg-slate-50 border-none p-4 rounded-2xl text-sm"
+              <div className="grid grid-cols-1 sm:grid-cols-2 gap-5">
+                <div className="space-y-2">
+                  <label className="text-[10px] font-black uppercase text-slate-400 ml-2 tracking-widest">Ex-Showroom (₹)</label>
+                  <input name="exShowroomPrice" type="number" required className="w-full bg-slate-50 border-none p-4 rounded-2xl text-sm font-bold focus:ring-2 focus:ring-orange-500 transition-all"
                     value={formData.exShowroomPrice} onChange={handleInputChange} />
                 </div>
-                <div className="space-y-1">
-                  <label className="text-[10px] font-black uppercase text-slate-400 ml-1">On-Road</label>
-                  <input name="onRoadPrice" type="number" required className="w-full bg-slate-50 border-none p-4 rounded-2xl text-sm"
+                <div className="space-y-2">
+                  <label className="text-[10px] font-black uppercase text-slate-400 ml-2 tracking-widest">On-Road (₹)</label>
+                  <input name="onRoadPrice" type="number" required className="w-full bg-slate-50 border-none p-4 rounded-2xl text-sm font-bold focus:ring-2 focus:ring-orange-500 transition-all"
                     value={formData.onRoadPrice} onChange={handleInputChange} />
                 </div>
               </div>
 
-              <div className="space-y-1">
-                <label className="text-[10px] font-black uppercase text-slate-400 ml-1">Stock Quantity</label>
-                <input name="stock" type="number" required className="w-full bg-slate-50 border-none p-4 rounded-2xl text-sm"
+              <div className="space-y-2">
+                <label className="text-[10px] font-black uppercase text-slate-400 ml-2 tracking-widest">Inventory Quantity</label>
+                <input name="stock" type="number" required className="w-full bg-slate-50 border-none p-4 rounded-2xl text-sm font-bold focus:ring-2 focus:ring-orange-500 transition-all"
                   value={formData.stock} onChange={handleInputChange} />
               </div>
 
-              <div className="space-y-1">
-                <label className="text-[10px] font-black uppercase text-slate-400 ml-1">Vehicle Image</label>
-                <input name="image" type="file" className="text-xs block w-full text-slate-500 file:mr-4 file:py-2 file:px-4 file:rounded-full file:border-0 file:text-[10px] file:font-black file:bg-orange-50 file:text-orange-700 hover:file:bg-orange-100" onChange={handleInputChange} />
+              <div className="space-y-2">
+                <label className="text-[10px] font-black uppercase text-slate-400 ml-2 tracking-widest">Visual Asset (JPEG/PNG)</label>
+                <div className="relative group">
+                  <input name="image" type="file" className="hidden" id="car-image-upload" onChange={handleInputChange} />
+                  <label htmlFor="car-image-upload" className="flex items-center justify-center gap-3 w-full border-2 border-dashed border-slate-200 p-8 rounded-[2rem] cursor-pointer group-hover:border-orange-500 transition-all group-hover:bg-orange-50/50">
+                    <ImageIcon className="text-slate-400 group-hover:text-orange-500" size={24} />
+                    <span className="text-xs font-black text-slate-500 uppercase tracking-widest group-hover:text-orange-600">
+                      {formData.image ? formData.image.name : "Select Image File"}
+                    </span>
+                  </label>
+                </div>
               </div>
 
-              <button type="submit" className="w-full bg-orange-600 text-white py-4 rounded-2xl font-black uppercase tracking-widest shadow-xl shadow-orange-600/20 hover:bg-orange-700 transition-all mt-4">
-                {editingId ? "Update Inventory" : "Finalize Asset"}
+              <button type="submit" className="w-full bg-slate-900 text-white py-5 rounded-[2rem] font-black uppercase tracking-widest text-[10px] md:text-xs shadow-2xl shadow-slate-900/20 hover:bg-orange-600 transition-all mt-6 active:scale-95">
+                {editingId ? "Update Audit Record" : "Synchronize Asset to Fleet"}
               </button>
             </form>
           </div>
