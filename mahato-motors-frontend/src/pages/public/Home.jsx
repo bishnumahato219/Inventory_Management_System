@@ -2,13 +2,13 @@ import { useEffect, useState } from "react";
 import { useNavigate } from "react-router-dom";
 import Navbar from "../../components/navbar/Navbar";
 import { Search, ArrowRight, Zap, ShieldCheck, ChevronRight } from "lucide-react";
+import API from "../../api/axios"; // Import your Axios instance
 
-// Updated with high-quality Suzuki model slides
 const slides = [
-  "https://images.livemint.com/img/2022/06/30/1600x900/Maruti_Suzuki_Breza_1656584283120_1656584283307.jpg", // Brezza
-  "https://www.marutisuzuki.com/channels/nexa/car-models/grand-vitara/-/media/images/maruti/marutisuzuki/modules/car-details-page/grand-vitara/color/celestial-blue.png", // Grand Vitara
-  "https://img.indianautosblog.com/resize/750x-/2018/04/2018-Maruti-Ertiga-Suzuki-Ertiga-front-angle.jpg", // Ertiga
-  "https://stimg.cardekho.com/images/carexteriorimages/930x620/Maruti/Swift/11721/1715243163155/front-left-side-47.jpg" // New Swift
+  "https://images.livemint.com/img/2022/06/30/1600x900/Maruti_Suzuki_Breza_1656584283120_1656584283307.jpg",
+  "https://www.marutisuzuki.com/channels/nexa/car-models/grand-vitara/-/media/images/maruti/marutisuzuki/modules/car-details-page/grand-vitara/color/celestial-blue.png",
+  "https://img.indianautosblog.com/resize/750x-/2018/04/2018-Maruti-Ertiga-Suzuki-Ertiga-front-angle.jpg",
+  "https://stimg.cardekho.com/images/carexteriorimages/930x620/Maruti/Swift/11721/1715243163155/front-left-side-47.jpg"
 ];
 
 export default function Home() {
@@ -19,7 +19,8 @@ export default function Home() {
   const [search, setSearch] = useState("");
   const [fuel, setFuel] = useState("");
 
-  const IMAGE_BASE_URL = "http://localhost:5000/";
+  // Point this to your Render URL (without the /api)
+  const RENDER_BACKEND_URL = "https://inventory-management-system-ftg8.onrender.com";
 
   useEffect(() => {
     if (slides.length === 0) return;
@@ -32,11 +33,12 @@ export default function Home() {
   useEffect(() => {
     const fetchCars = async () => {
       try {
-        const res = await fetch("http://localhost:5000/api/cars");
-        const data = await res.json();
-        setCars(Array.isArray(data) ? data : []);
+        setLoading(true);
+        // Use your API instance instead of fetch
+        const res = await API.get("/cars");
+        setCars(Array.isArray(res.data) ? res.data : []);
       } catch (err) {
-        console.error("Inventory sync failed.");
+        console.error("Inventory sync failed:", err);
         setCars([]);
       } finally {
         setLoading(false);
@@ -66,9 +68,9 @@ export default function Home() {
     <div className="min-h-screen bg-slate-50 selection:bg-orange-500 selection:text-white overflow-x-hidden">
       <Navbar />
 
-      {/* 1. HERO SECTION - Cinematic & Responsive Typography */}
+      {/* 1. HERO SECTION */}
       <section className="relative h-[85vh] md:h-[90vh] w-full overflow-hidden">
-        {slides.length > 0 && slides.map((img, index) => (
+        {slides.map((img, index) => (
           <div
             key={index}
             className={`absolute inset-0 transition-all duration-1000 ease-in-out transform ${
@@ -81,7 +83,6 @@ export default function Home() {
             />
           </div>
         ))}
-
         <div className="absolute inset-0 bg-gradient-to-r from-slate-950 via-slate-900/60 to-transparent"></div>
         <div className="absolute bottom-0 left-0 w-full h-32 bg-gradient-to-t from-slate-50 to-transparent"></div>
 
@@ -109,7 +110,7 @@ export default function Home() {
         </div>
       </section>
 
-      {/* 2. INVENTORY SECTION - Responsive Grid (1 to 3 cols) */}
+      {/* 2. INVENTORY SECTION */}
       <section id="collection" className="py-16 md:py-24 px-4 md:px-20">
         <div className="max-w-7xl mx-auto mb-12 md:mb-16">
           <div className="flex flex-col md:flex-row md:items-end justify-between gap-8 mb-12">
@@ -118,7 +119,6 @@ export default function Home() {
               <div className="h-1.5 w-20 md:w-24 bg-orange-600 mt-3 md:mt-4"></div>
             </div>
             
-            {/* Responsive Search & Filter Bar */}
             <div className="flex flex-col sm:flex-row gap-4 w-full md:w-auto">
               <div className="relative flex-1 sm:min-w-[300px]">
                 <Search className="absolute left-4 top-1/2 -translate-y-1/2 text-slate-400" size={18} />
@@ -144,16 +144,21 @@ export default function Home() {
           </div>
 
           {loading ? (
-            <div className="text-center py-20 text-slate-400 font-bold uppercase tracking-widest animate-pulse text-xs">Synchronizing Asset Registry...</div>
+            <div className="text-center py-20 text-slate-400 font-bold uppercase tracking-widest animate-pulse text-xs italic">
+              Synchronizing Asset Registry...
+            </div>
           ) : (
             <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6 md:gap-10">
               {filteredCars.map((car) => (
                 <div key={car._id} className="group bg-white rounded-[2rem] md:rounded-[2.5rem] overflow-hidden border border-slate-100 shadow-sm hover:shadow-2xl transition-all duration-500">
                   <div className="h-56 md:h-64 overflow-hidden relative">
                     <img
-                      src={car.image ? `${IMAGE_BASE_URL}${car.image}` : "https://via.placeholder.com/400x300?text=Mahato+Motors"}
+                      src={car.image?.startsWith('http') 
+                        ? car.image 
+                        : `${RENDER_BACKEND_URL}/${car.image}`.replace(/([^:]\/)\/+/g, "$1")}
                       alt={car.modelName}
                       className="w-full h-full object-cover transition-transform duration-700 group-hover:scale-110"
+                      onError={(e) => { e.target.src = "https://via.placeholder.com/400x300?text=Preview+Unavailable"; }}
                     />
                     <div className="absolute top-4 right-4 bg-white/90 backdrop-blur px-3 py-1 rounded-full text-[9px] font-black uppercase tracking-widest text-slate-800">
                       {car.fuelType}
@@ -184,8 +189,9 @@ export default function Home() {
         </div>
       </section>
 
-      {/* 3. FOOTER - Responsive Stack */}
+      {/* 3. FOOTER */}
       <footer className="bg-slate-950 text-white pt-20 pb-10 px-6 md:px-24">
+        {/* ... (Footer content stays same) ... */}
         <div className="grid grid-cols-1 lg:grid-cols-3 gap-12 md:gap-20 mb-16">
           <div className="lg:col-span-2">
             <h2 className="text-3xl md:text-5xl font-black uppercase tracking-tighter mb-8">Mahato <span className="text-orange-600">Motors.</span></h2>
@@ -209,14 +215,14 @@ export default function Home() {
           <div>
             <h4 className="text-orange-500 font-black uppercase text-[10px] tracking-[0.2em] mb-6">Contact Registry</h4>
             <ul className="space-y-3 text-slate-400 text-xs font-medium">
-              <li>Showroom: NH-33, Near Gandhinagar, Haldia</li>
-              <li>Support Line: +91 99392 74587</li>
+              <li>Showroom: NH-33, Near Dhanbad, Jharkhand</li>
+              <li>Support Line: +91 9113456786</li>
               <li>Operational: Mon - Sat (9AM - 8PM)</li>
             </ul>
           </div>
         </div>
         <p className="pt-10 border-t border-slate-900 text-slate-700 text-[9px] font-black uppercase tracking-[0.3em] md:tracking-[0.5em] text-center">
-          © 2026 Mahato Motors Pvt Ltd. Haldia Region.
+          © 2026 Mahato Motors Pvt Ltd. Dhanbad Region.
         </p>
       </footer>
     </div>

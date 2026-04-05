@@ -3,14 +3,15 @@ import { useNavigate, Link } from "react-router-dom";
 import { Eye, EyeOff, User, Mail, Phone, Lock, ChevronRight } from "lucide-react";
 import API from "../../api/axios";
 
+// STABLE HIGH-RES SUZUKI IMAGE LINKS
 const slides = [
   {
-    url: "https://imgd.aeplcdn.com/1920x1080/n/cw/ec/107543/brezza-exterior-left-front-three-quarter-3.jpeg?isig=0&q=40",
+    url: "https://images.hindustantimes.com/auto/img/2023/06/30/1600x900/Maruti_Suzuki_Invi_1688102434524_1688102444654.jpg",
     title: "Premium Experience",
     desc: "Join the elite circle of automotive excellence at Mahato Motors."
   },
   {
-    url: "https://imgd.aeplcdn.com/1920x1080/n/cw/ec/147201/invicto-exterior-right-rear-three-quarter.jpeg?isig=0&q=40",
+    url: "https://www.marutisuzuki.com/channels/nexa/car-models/grand-vitara/-/media/images/maruti/marutisuzuki/modules/car-details-page/grand-vitara/color/celestial-blue.png",
     title: "Expert Management",
     desc: "Precision tools for modern dealership operations and stock control."
   }
@@ -60,7 +61,7 @@ export default function Register() {
   return (
     <div className="min-h-screen flex relative overflow-hidden bg-white">
       
-      {/* 1. LEFT VISUAL SECTION - Hidden on Mobile/Tablet (LG breakpoint) */}
+      {/* 1. LEFT VISUAL SECTION */}
       <div className="hidden lg:block lg:w-1/2 relative overflow-hidden bg-slate-900">
         {slides.map((slide, index) => (
           <div
@@ -69,7 +70,13 @@ export default function Register() {
               index === current ? "opacity-60 scale-100" : "opacity-0 scale-110"
             }`}
           >
-            <img src={slide.url} alt="Mahato Motors Fleet" className="w-full h-full object-cover" />
+            {/* Added onError to handle broken external links automatically */}
+            <img 
+              src={slide.url} 
+              alt="Mahato Motors Fleet" 
+              className="w-full h-full object-cover" 
+              onError={(e) => { e.target.src = "https://images.unsplash.com/photo-1492144534655-ae79c964c9d7?q=80&w=1600&auto=format&fit=crop"; }}
+            />
           </div>
         ))}
 
@@ -95,11 +102,10 @@ export default function Register() {
         </div>
       </div>
 
-      {/* 2. RIGHT FORM SECTION - Fully Responsive */}
+      {/* 2. RIGHT FORM SECTION */}
       <div className="w-full lg:w-1/2 flex items-center justify-center p-6 sm:p-12 md:p-20 bg-slate-50 lg:bg-white">
         <div className="w-full max-w-md bg-white lg:bg-transparent p-8 md:p-10 lg:p-0 rounded-[2.5rem] lg:rounded-none shadow-2xl shadow-slate-200/50 lg:shadow-none animate-in fade-in slide-in-from-right-4 duration-700">
           
-          {/* Mobile Header (Hidden on Desktop) */}
           <div className="lg:hidden mb-10 text-center">
             <h1 className="text-3xl font-black text-slate-900 tracking-tighter uppercase">
               Mahato <span className="text-orange-600">Motors.</span>
@@ -121,7 +127,6 @@ export default function Register() {
 
           <form onSubmit={handleRegister} className="space-y-4 md:space-y-5">
             <div className="space-y-4">
-              {/* Responsive Inputs with Icons */}
               {[
                 { icon: <User />, name: "name", type: "text", placeholder: "Staff Full Name" },
                 { icon: <Mail />, name: "email", type: "email", placeholder: "Corporate Email" },
@@ -142,7 +147,6 @@ export default function Register() {
                 </div>
               ))}
 
-              {/* Password Field */}
               <div className="relative group">
                 <Lock className="absolute left-4 top-1/2 -translate-y-1/2 text-slate-400 group-focus-within:text-orange-500 transition-colors" size={18} />
                 <input

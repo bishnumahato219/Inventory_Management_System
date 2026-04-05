@@ -11,21 +11,22 @@ const Login = () => {
   const [error, setError] = useState("");
   const navigate = useNavigate();
 
+  // STABLE MARUTI SUZUKI IMAGE LINKS
   const slides = [
     {
-      url: "https://images.livemint.com/img/2022/06/30/1600x900/Maruti_Suzuki_Breza_1656584283120_1656584283307.jpg",
-      title: "Premium Inventory",
-      desc: "Manage your Maruti Suzuki fleet with precision."
+      url: "https://images.hindustantimes.com/auto/img/2023/06/07/1600x900/Maruti_Suzuki_Jimny_1686121404094_1686121415668.jpg",
+      title: "Jimny 4x4",
+      desc: "Adventure-ready fleet management for the modern dealer."
     },
     {
       url: "https://www.marutisuzuki.com/channels/nexa/car-models/grand-vitara/-/media/images/maruti/marutisuzuki/modules/car-details-page/grand-vitara/color/celestial-blue.png",
-      title: "Real-time Tracking",
-      desc: "Monitor showroom stock and sales instantly."
+      title: "Grand Vitara",
+      desc: "Monitor premium NEXA inventory and stock levels in real-time."
     },
     {
-      url: "https://imgd.aeplcdn.com/1920x1080/n/cw/ec/139269/e-vitara-interior-dashboard.jpeg?isig=0&q=40",
-      title: "Smart Analytics",
-      desc: "Drive dealership growth with data-driven insights."
+      url: "https://images.moneycontrol.com/static-mcnews/2024/05/20240509071520_Maruti-Suzuki-Swift-2024.jpg",
+      title: "The All-New Swift",
+      desc: "Optimize sales performance with data-driven analytics."
     }
   ];
 
@@ -55,7 +56,7 @@ const Login = () => {
   return (
     <div className="flex min-h-screen bg-white overflow-hidden">
       
-      {/* 1. LEFT SIDE: CINEMATIC SLIDER - Hidden on screens smaller than LG (1024px) */}
+      {/* 1. LEFT SIDE: CINEMATIC SLIDER */}
       <div className="hidden lg:flex lg:w-1/2 relative overflow-hidden bg-slate-900">
         {slides.map((slide, index) => (
           <div
@@ -64,7 +65,13 @@ const Login = () => {
               index === currentSlide ? "opacity-60 scale-100" : "opacity-0 scale-110"
             }`}
           >
-            <img src={slide.url} alt="Showroom" className="w-full h-full object-cover" />
+            {/* Added onError fallback to handle any future broken links */}
+            <img 
+              src={slide.url} 
+              alt="Mahato Motors Showroom" 
+              className="w-full h-full object-cover" 
+              onError={(e) => { e.target.src = "https://images.unsplash.com/photo-1562141961-b5d19729742e?q=80&w=1600&auto=format&fit=crop"; }}
+            />
           </div>
         ))}
         <div className="absolute inset-0 bg-gradient-to-t from-slate-950 via-transparent to-transparent"></div>
@@ -74,7 +81,7 @@ const Login = () => {
             Mahato <span className="text-orange-500">Motors.</span>
           </h1>
           <h2 className="text-2xl font-bold text-white mb-2">{slides[currentSlide].title}</h2>
-          <p className="text-slate-300 text-lg max-w-md font-medium">{slides[currentSlide].desc}</p>
+          <p className="text-slate-300 text-lg max-w-md font-medium leading-relaxed">{slides[currentSlide].desc}</p>
           
           <div className="flex gap-2 mt-8">
             {slides.map((_, i) => (
@@ -84,11 +91,10 @@ const Login = () => {
         </div>
       </div>
 
-      {/* 2. RIGHT SIDE: AUTH FORM - Responsive Width & Padding */}
+      {/* 2. RIGHT SIDE: AUTH FORM */}
       <div className="w-full lg:w-1/2 flex items-center justify-center p-6 sm:p-12 md:p-20 bg-slate-50 lg:bg-white">
-        <div className="w-full max-w-md bg-white lg:bg-transparent p-8 lg:p-0 rounded-[2.5rem] lg:rounded-none shadow-2xl shadow-slate-200/50 lg:shadow-none">
+        <div className="w-full max-w-md bg-white lg:bg-transparent p-8 lg:p-0 rounded-[2.5rem] lg:rounded-none shadow-2xl shadow-slate-200/50 lg:shadow-none animate-in fade-in slide-in-from-right-4 duration-700">
           
-          {/* Mobile Header (Only visible when slider is hidden) */}
           <div className="lg:hidden mb-8 text-center">
             <h1 className="text-3xl font-black text-slate-900 tracking-tighter uppercase">
               Mahato <span className="text-orange-600">Motors.</span>
@@ -97,18 +103,17 @@ const Login = () => {
 
           <div className="mb-10 text-center lg:text-left">
             <h2 className="text-3xl md:text-4xl font-black text-slate-900 tracking-tight uppercase">Sign <span className="text-orange-600">In</span></h2>
-            <p className="text-slate-500 font-medium mt-2 text-sm md:text-base">Identity verification for dealership access.</p>
+            <p className="text-slate-500 font-medium mt-2 text-sm md:text-base italic">Identity verification for dealership access.</p>
           </div>
 
           {error && (
-            <div className="mb-6 text-red-600 text-[10px] md:text-xs font-black uppercase tracking-widest bg-red-50 p-4 rounded-2xl border border-red-100 animate-in fade-in slide-in-from-top-2">
-              ⚠️ {error}
+            <div className="mb-6 text-red-600 text-[10px] md:text-xs font-black uppercase tracking-widest bg-red-50 p-4 rounded-2xl border border-red-100 flex items-center gap-2">
+              <span>⚠️</span> {error}
             </div>
           )}
 
           <form onSubmit={handleSubmit} className="space-y-5 md:space-y-6">
             <div className="space-y-4">
-              {/* EMAIL */}
               <div className="relative group">
                 <Mail className="absolute left-4 top-1/2 -translate-y-1/2 text-slate-400 group-focus-within:text-orange-500 transition-colors" size={18} />
                 <input
@@ -120,7 +125,6 @@ const Login = () => {
                 />
               </div>
 
-              {/* PASSWORD */}
               <div className="relative group">
                 <Lock className="absolute left-4 top-1/2 -translate-y-1/2 text-slate-400 group-focus-within:text-orange-500 transition-colors" size={18} />
                 <input
