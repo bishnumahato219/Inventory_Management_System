@@ -5,8 +5,8 @@ import { Search, ArrowRight, Zap, ShieldCheck, ChevronRight } from "lucide-react
 import API from "../../api/axios"; // Import your Axios instance
 
 const slides = [
-  "https://i.pinimg.com/736x/06/f7/ea/06f7ea1a5b0cd64876ada3ca936f6fe9.jpg",
-  "https://i.pinimg.com/736x/24/01/f1/2401f1b6eeb28aca2acd5902427feae5.jpg",
+  "https://i.pinimg.com/736x/b1/7e/6f/b17e6f4f9eb49d3c2bd46dac19dbe626.jpg",
+  "https://c.ndtvimg.com/2025-02/tulmf6ro_maruti-suzuki-dzire-nascar-render_625x300_24_February_25.jpg?im=FitAndFill,algorithm=dnn,width=1200,height=800",
   "https://i.pinimg.com/control1/736x/9f/8b/be/9f8bbe1ec8472073cdde4c4d839553eb.jpg",
   "https://i.pinimg.com/736x/1a/5c/9a/1a5c9a2e0f16c9563a4076ebdd482df7.jpg"
 ];
