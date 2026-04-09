@@ -14,19 +14,24 @@ const Login = () => {
   // STABLE MARUTI SUZUKI IMAGE LINKS
   const slides = [
     {
-      url: "https://images.unsplash.com/photo-1533473359331-0135ef1b58bf?q=80&w=1600&auto=format&fit=crop",
-      title: "Jimny 4x4",
-      desc: "Adventure-ready fleet management for the modern dealer."
+      url: "https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcQKuHj996NnYfAJEAClKqL3qNGzBDHe3_YXag&s",
+      title: "Classic Reliability",
+      desc: "Managing India's favorite reliable fleet with ease."
     },
     {
-      url: "https://images.unsplash.com/photo-1492144534655-ae79c964c9d7?q=80&w=1600&auto=format&fit=crop",
-      title: "Grand Vitara",
-      desc: "Monitor premium NEXA inventory and stock levels in real-time."
+      url: "https://media.zigcdn.com/media/model/2025/Jul/model-extimg-196959712_600x400.jpg",
+      title: "The Next Generation",
+      desc: "Experience the future of Maruti Suzuki with the 2025 lineup."
     },
     {
-      url: "https://images.unsplash.com/photo-1542281286-9e0a16bb7366?q=80&w=1600&auto=format&fit=crop",
-      title: "The All-New Swift",
-      desc: "Optimize sales performance with data-driven analytics."
+      url: "https://imgd.aeplcdn.com/664x374/n/cw/ec/130591/fronx-exterior-right-rear-three-quarter-6.jpeg?isig=0&q=80",
+      title: "Fronx Performance",
+      desc: "High-performance SUVs for the modern explorer."
+    },
+    {
+      url: "https://imgd.aeplcdn.com/370x208/cw/ec/32475/Maruti-Suzuki-New-Swift-Exterior-116090.jpg?wm=1&q=80",
+      title: "Swift Elegance",
+      desc: "Optimized inventory control for the most loved hatchback."
     }
   ];
 
