@@ -5,10 +5,10 @@ import { Search, ArrowRight, Zap, ShieldCheck, ChevronRight } from "lucide-react
 import API from "../../api/axios"; // Import your Axios instance
 
 const slides = [
-  "https://images.livemint.com/img/2022/06/30/1600x900/Maruti_Suzuki_Breza_1656584283120_1656584283307.jpg",
-  "https://www.marutisuzuki.com/channels/nexa/car-models/grand-vitara/-/media/images/maruti/marutisuzuki/modules/car-details-page/grand-vitara/color/celestial-blue.png",
-  "https://img.indianautosblog.com/resize/750x-/2018/04/2018-Maruti-Ertiga-Suzuki-Ertiga-front-angle.jpg",
-  "https://stimg.cardekho.com/images/carexteriorimages/930x620/Maruti/Swift/11721/1715243163155/front-left-side-47.jpg"
+  "https://images.unsplash.com/photo-1533473359331-0135ef1b58bf?q=80&w=1600&auto=format&fit=crop",
+  "https://images.unsplash.com/photo-1492144534655-ae79c964c9d7?q=80&w=1600&auto=format&fit=crop",
+  "https://images.unsplash.com/photo-1542281286-9e0a16bb7366?q=80&w=1600&auto=format&fit=crop",
+  "https://images.unsplash.com/photo-1562141961-b5d19729742e?q=80&w=1600&auto=format&fit=crop"
 ];
 
 export default function Home() {

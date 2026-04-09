@@ -1,17 +1,17 @@
 import React, { useState, useEffect } from "react";
 import { useNavigate, Link } from "react-router-dom";
-import { Eye, EyeOff, User, Mail, Phone, Lock, ChevronRight } from "lucide-react";
+import { Eye, EyeOff, User, Mail, Phone, Lock, ChevronRight, ArrowLeft } from "lucide-react";
 import API from "../../api/axios";
 
 // STABLE HIGH-RES SUZUKI IMAGE LINKS
 const slides = [
   {
-    url: "https://images.hindustantimes.com/auto/img/2023/06/30/1600x900/Maruti_Suzuki_Invi_1688102434524_1688102444654.jpg",
+    url: "https://images.unsplash.com/photo-1503376780353-7e6692767b70?q=80&w=1600&auto=format&fit=crop",
     title: "Premium Experience",
     desc: "Join the elite circle of automotive excellence at Mahato Motors."
   },
   {
-    url: "https://www.marutisuzuki.com/channels/nexa/car-models/grand-vitara/-/media/images/maruti/marutisuzuki/modules/car-details-page/grand-vitara/color/celestial-blue.png",
+    url: "https://images.unsplash.com/photo-1492144534655-ae79c964c9d7?q=80&w=1600&auto=format&fit=crop",
     title: "Expert Management",
     desc: "Precision tools for modern dealership operations and stock control."
   }
@@ -110,6 +110,16 @@ export default function Register() {
             <h1 className="text-3xl font-black text-slate-900 tracking-tighter uppercase">
               Mahato <span className="text-orange-600">Motors.</span>
             </h1>
+          </div>
+
+          <div className="mb-6 mb-10 text-center lg:text-left">
+            <Link 
+              to="/" 
+              className="inline-flex items-center gap-2 px-4 py-2 bg-slate-100 hover:bg-orange-100 text-slate-600 hover:text-orange-600 rounded-full transition-all duration-300 group"
+            >
+              <ArrowLeft size={16} className="group-hover:-translate-x-1 transition-transform" />
+              <span className="text-[10px] font-black uppercase tracking-widest">Back to Home</span>
+            </Link>
           </div>
 
           <div className="mb-8 text-center lg:text-left">
