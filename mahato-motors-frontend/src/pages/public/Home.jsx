@@ -5,10 +5,10 @@ import { Search, ArrowRight, Zap, ShieldCheck, ChevronRight } from "lucide-react
 import API from "../../api/axios"; // Import your Axios instance
 
 const slides = [
-  "https://stimg.cardekho.com/images/carexteriorimages/630x420/Maruti/Brezza/10388/1774618174088/front-left-side-47.jpg?tr=w-664",
-  "https://stimg.cardekho.com/images/carexteriorimages/630x420/Maruti/Grand-Vitara/10501/1755776910397/front-left-side-47.jpg?tr=w-664",
-  "https://stimg.cardekho.com/images/carexteriorimages/630x420/Maruti/Jimny/6182/1762859095762/front-left-side-47.jpg?tr=w-664",
-  "https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcRtp4en7oQPtTEfBGWfcVQV-TnD4CRiXeyEzQ&s"
+  "https://i.pinimg.com/736x/06/f7/ea/06f7ea1a5b0cd64876ada3ca936f6fe9.jpg",
+  "https://i.pinimg.com/736x/24/01/f1/2401f1b6eeb28aca2acd5902427feae5.jpg",
+  "https://i.pinimg.com/control1/736x/9f/8b/be/9f8bbe1ec8472073cdde4c4d839553eb.jpg",
+  "https://i.pinimg.com/736x/1a/5c/9a/1a5c9a2e0f16c9563a4076ebdd482df7.jpg"
 ];
 
 export default function Home() {

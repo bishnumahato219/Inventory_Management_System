@@ -14,12 +14,12 @@ const Login = () => {
   // STABLE MARUTI SUZUKI IMAGE LINKS
   const slides = [
     {
-      url: "https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcQKuHj996NnYfAJEAClKqL3qNGzBDHe3_YXag&s",
+      url: "https://i.pinimg.com/736x/95/91/3e/95913ec1ea8d8de1893dadc339902b04.jpg",
       title: "Classic Reliability",
       desc: "Managing India's favorite reliable fleet with ease."
     },
     {
-      url: "https://media.zigcdn.com/media/model/2025/Jul/model-extimg-196959712_600x400.jpg",
+      url: "https://i.pinimg.com/736x/90/13/31/901331f9665e2b5b27b383650718e3b7.jpg",
       title: "The Next Generation",
       desc: "Experience the future of Maruti Suzuki with the 2025 lineup."
     },
@@ -29,7 +29,7 @@ const Login = () => {
       desc: "High-performance SUVs for the modern explorer."
     },
     {
-      url: "https://imgd.aeplcdn.com/370x208/cw/ec/32475/Maruti-Suzuki-New-Swift-Exterior-116090.jpg?wm=1&q=80",
+      url: "https://i.pinimg.com/736x/bd/7b/e8/bd7be8bae810b09944a65e8ec5fe7272.jpg",
       title: "Swift Elegance",
       desc: "Optimized inventory control for the most loved hatchback."
     }
